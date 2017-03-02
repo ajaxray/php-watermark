@@ -1,0 +1,24 @@
+{
+    "name"             : "ajaxray/php-watermark",
+    "description"      : "Add text or image watermark on images.",
+    "minimum-stability": "dev",
+    "license"          : "MIT",
+    "keywords"         : ["watermark", "image", "image-manupulation", "imagemagick-watermark"],
+    "homepage"         : "http://github.com/ajaxray/php-watermark",
+    "type"             : "library",
+    "authors"          : [
+        {
+            "name" : "Anis Uddin Ahmad",
+            "email": "anis.programmer@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "autoload": {
+        "psr-4": {"Ajaxray\\PHPWatermark\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4": {"Ajaxray\\PHPWatermark\\": "tests/"}
+    }
+}
