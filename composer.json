@@ -3,7 +3,7 @@
     "description"      : "Add text or image watermark on images.",
     "minimum-stability": "dev",
     "license"          : "MIT",
-    "keywords"         : ["watermark", "image", "image-manupulation", "imagemagick-watermark"],
+    "keywords"         : ["watermark", "image", "image-manipulation", "imagemagick-watermark", "imagemagick-wrapper"],
     "homepage"         : "http://github.com/ajaxray/php-watermark",
     "type"             : "library",
     "authors"          : [
