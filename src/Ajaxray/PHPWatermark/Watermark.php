@@ -11,6 +11,11 @@ namespace Ajaxray\PHPWatermark;
 // https://www.sitepoint.com/adding-text-watermarks-with-imagick/
 // http://www.imagemagick.org/Usage/annotating/#watermarking
 
+/**
+ * Class Watermark
+ *
+ * @package Ajaxray\PHPWatermark
+ */
 class Watermark
 {
     // Anchors to place text/image
@@ -24,7 +29,6 @@ class Watermark
     const POSITION_BOTTOM = 'South';
     const POSITION_BOTTOM_RIGHT = 'SouthEast';
 
-
     // @TODO : Option to change style
     const IMG_STYLE_COLORLESS = 1;
     const IMG_STYLE_DISSOLVE = 2;
@@ -36,7 +40,7 @@ class Watermark
     private $offsetX = 0;
     private $offsetY = 0;
     private $tiled = false;
-    private $tileSize = ['100', '100'];
+    private $tileSize = [100, 100];
 
     /**
      * Font name. Should be one of the list displayed by `convert -list font` command
@@ -331,40 +335,3 @@ class Watermark
         return escapeshellarg($this->source);
     }
 }
-
-/**
- * Image option
- * - png image
- * - position
- * - transparency %
- * - keep color (watermark/dissolve)
- * - tile
- *
- * Text Options
- * - text
- * - position
- * - font
- * - fill (color)
- * - transparency
- */
-/**
-=> Normal Text
-$ convert sample1.jpg -pointsize 100 -font Arial -fill rgba\(0,0,0,0.4\) -gravity center -annotate +0+0 \"DocuDEX\" transparent_text_1.jpg
-$ convert transparent_text_1.jpg -pointsize 100 -font Arial -fill rgba\(255,255,255,0.4\) -gravity center -annotate +2+2 \"DocuDEX\" transparent_text_2.jpg
-
-=>Tile
-convert -size 140x80 xc:none -fill grey -gravity NorthWest -draw "text 10,10 'Copyright'" -gravity SouthEast -draw "text 5,15 'Copyright'" miff:- | composite -tile - sample1.jpg  result.png
-
-=> tile with rotate
-convert -size 140x80 xc:none -fill "rgba(0,0,0,.4)" -pointsize 24 -gravity NorthWest -draw "rotate 15 text 10,10 'Copyright'" -gravity SouthEast -draw "rotate 15 text 5,15 'Copyright'"  miff:- | composite -tile - sample1.jpg  result.png
-=> with Image
-composite -gravity center -dissolve 30% -tile logo.png sample.jpg sample_w.jpg
-
-=> Try PDF
-convert -density 150 -strip -interlace JPEG -compress JPEG -quality 60 -sharpen 0x1.0 -trim -fill grey -font Arial-Bold -pointsize 10 -gravity South -layers composite -annotate +0+0 'ITU Mustafa Inan Kutuphanesi' special.pdf special_1.pdf
-
- *
- *
- *
- */
-
