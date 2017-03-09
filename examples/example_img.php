@@ -25,4 +25,5 @@ $imgMark = new Watermark(__DIR__ . '/img/mountain.jpg');
 $imgMark->setPosition(Watermark::POSITION_TOP_RIGHT);
 $imgMark->setOffset(50, 50);
 $imgMark->setOpacity(.3);
+$imgMark->setStyle(Watermark::IMG_STYLE_DISSOLVE);
 $imgMark->withImage(__DIR__ . '/img/php.png', __DIR__ . '/img/result_logo.jpg');

@@ -10,7 +10,6 @@ namespace Ajaxray\PHPWatermark;
 
 // https://www.sitepoint.com/adding-text-watermarks-with-imagick/
 // http://www.imagemagick.org/Usage/annotating/#watermarking
-
 /**
  * Class Watermark
  *
@@ -30,36 +29,41 @@ class Watermark
     const POSITION_BOTTOM_RIGHT = 'SouthEast';
 
     // @TODO : Option to change style
-    const IMG_STYLE_COLORLESS = 1;
-    const IMG_STYLE_DISSOLVE = 2;
-    const TEXT_STYLE_DARK = 1;
-    const TEXT_STYLE_LIGHT = 2;
-    const TEXT_STYLE_BEVEL = 3;
+    const IMG_STYLE_DISSOLVE = 1;
+    const IMG_STYLE_COLORLESS = 2;
+    const TEXT_STYLE_BEVEL = 1;
+    const TEXT_STYLE_DARK = 2;
+    const TEXT_STYLE_LIGHT = 3;
 
-    private $position = 'Center';
-    private $offsetX = 0;
-    private $offsetY = 0;
-    private $tiled = false;
-    private $tileSize = [100, 100];
+    const PATTERN_MIME_IMAGE = '/^image\/\w{1,4}$/';
+    const PATTERN_MIME_PDF = '/^application\/(x\-)?pdf$/';
 
-    /**
-     * Font name. Should be one of the list displayed by `convert -list font` command
-     *
-     * @var string
-     */
-    private $font = 'Arial';
-    private $fontSize = 12;
-    private $opacity = 0.4;
-    private $rotate = 0;
+    private $options = [
+        'position' => 'Center',
+        'offsetX' => 0,
+        'offsetY' => 0,
+        'tiled' => false,
+        'tileSize' => [100, 100],
+        'font' => 'Arial',
+        'fontSize' => 24,
+        'opacity' => 0.3,
+        'rotate' => 0,
+        'style' => 1, // IMG_STYLE_DISSOLVE or TEXT_STYLE_BEVEL
+    ];
+
     private $source;
+    private $commander;
+    private $debug = false;
 
     /**
      * Watermark constructor.
-     * @param string $source  Source Image
+     *
+     * @param string $source Source Image
      */
     public function __construct($source)
     {
         $this->source = $source;
+        $this->commander = $this->getCommandBuilder($source);
 
         return $this;
     }
@@ -67,22 +71,50 @@ class Watermark
     public function withText($text, $writeTo = null)
     {
         $destination = $writeTo ?: $this->source;
-        $this->ensureExists($this->source);
         $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
 
-        exec($this->buildTextMarkCommand($text, $destination), $output, $returnCode);
-        return (empty($output) && $returnCode == 0);
+        if($this->debug) {
+            return $this->commander->getTextMarkCommand($text, $destination, $this->options);
+        } else {
+            $output = $returnCode = null;
+            exec($this->commander->getTextMarkCommand($text, $destination, $this->options), $output, $returnCode);
+            return (empty($output) && $returnCode === 0);
+        }
     }
 
     public function withImage($marker, $writeTo = null)
     {
         $destination = $writeTo ?: $this->source;
-        $this->ensureExists($this->source);
         $this->ensureExists($marker);
         $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
 
-        exec($this->buildImageMarkCommand($marker, $destination), $output, $returnCode);
-        return (empty($output) && $returnCode == 0);
+        if($this->debug) {
+            return $this->commander->getImageMarkCommand($marker, $destination, $this->options);
+        } else {
+            $output = $returnCode = null;
+            exec($this->commander->getImageMarkCommand($marker, $destination, $this->options), $output, $returnCode);
+            return (empty($output) && $returnCode === 0);
+        }
+    }
+
+    /**
+     * Factory for choosing CommandBuilder
+     *
+     * @param $sourcePath
+     * @return CommandBuilders\ImageCommandBuilder|CommandBuilders\PDFCommandBuilder
+     */
+    protected function getCommandBuilder($sourcePath)
+    {
+        $this->ensureExists($this->source);
+        $mimeType = mime_content_type($sourcePath);
+
+        if (preg_match(self::PATTERN_MIME_IMAGE, $mimeType)) {
+            return new CommandBuilders\ImageCommandBuilder($sourcePath);
+        } elseif (preg_match(self::PATTERN_MIME_PDF, $mimeType)) {
+            return new CommandBuilders\PDFCommandBuilder($sourcePath);
+        } else {
+            throw new \InvalidArgumentException("The source file type $mimeType is not supported");
+        }
     }
 
     public function buildTextMarkCommand($text, $destination)
@@ -131,8 +163,154 @@ class Watermark
         //$opacity = 'dissolve '. ($this->getOpacity() * 100) .'%';
         $opacity = 'watermark '. ($this->getOpacity() * 100);
 
+        // @TODO : stretch to % of image or % of self
         // @TODO : Gap/offset between image tiles
         return "composite -$anchor -$offset -$rotate -$opacity $tile $marker $source $destination";
+    }
+
+    /**
+     * @return string
+     */
+    private function getSource()
+    {
+        return escapeshellarg($this->source);
+    }
+
+    /**
+     * @param string $position  One of Watermark::POSITION_* constants
+     * @return Watermark
+     */
+    public function setPosition($position)
+    {
+        if(in_array($position, $this->supportedPositionList())) {
+            $this->options['position'] = $position;
+        } else {
+            throw new \InvalidArgumentException("Position $position is not supported! Use Watermark::POSITION_* constants.");
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $offsetX
+     * @param int $offsetY
+     *
+     * @return Watermark
+     */
+    public function setOffset($offsetX, $offsetY)
+    {
+        $this->options['offsetX'] = intval($offsetX);
+        $this->options['offsetY'] = intval($offsetY);
+
+        return $this;
+    }
+
+    /**
+     * @param int $style
+     * @return Watermark
+     */
+    public function setStyle($style)
+    {
+        // @TODO : Check if in valid styles
+        $this->options['style'] = $style;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $tiled
+     * @return Watermark
+     */
+    public function setTiled($tiled = true)
+    {
+        $this->options['tiled'] = boolval($tiled);
+
+        return $this;
+    }
+
+    /**
+     * Size of tile box.
+     *
+     * @param $width
+     * @param $height
+     *
+     * @return Watermark
+     */
+    public function setTileSize($width, $height)
+    {
+        $this->options['tileSize'] = [intval($width), intval($height)];
+
+        return $this;
+    }
+
+    /**
+     * Font name. Should be one of the list displayed by `convert -list font` command
+     *
+     * @param string $font
+     * @return Watermark
+     */
+    public function setFont($font)
+    {
+        $this->options['font'] = $font;
+
+        return $this;
+    }
+
+    /**
+     * @param int $fontSize
+     * @return Watermark
+     */
+    public function setFontSize($fontSize)
+    {
+        $this->options['fontSize'] = intval($fontSize);
+
+        return $this;
+    }
+
+
+    /**
+     * @param float $opacity Between .1 (very transparent) to .9 (almost opaque).
+     * @return Watermark
+     */
+    public function setOpacity($opacity)
+    {
+        $this->options['opacity'] = floatval($opacity);
+
+        return $this;
+    }
+
+    /**
+     * @param int $rotate Degree of rotation
+     */
+    public function setRotate($rotate)
+    {
+        $this->options['rotate'] = intval($rotate);
+    }
+
+    /**
+     * @param bool $debug
+     * @return Watermark
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = boolval($debug);
+
+        return $this;
+    }
+
+    final public function supportedPositionList()
+    {
+        return [
+            self::POSITION_TOP_LEFT,
+            self::POSITION_TOP,
+            self::POSITION_TOP_RIGHT,
+            self::POSITION_RIGHT,
+            self::POSITION_CENTER,
+            self::POSITION_LEFT,
+            self::POSITION_BOTTOM_LEFT,
+            self::POSITION_BOTTOM,
+            self::POSITION_BOTTOM_RIGHT,
+        ];
     }
 
     private function ensureExists($filePath)
@@ -153,185 +331,4 @@ class Watermark
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getPosition()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @param string $position
-     * @return Watermark
-     */
-    public function setPosition($position)
-    {
-        // @TODO : Check if in accepted values
-        $this->position = $position;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOffset()
-    {
-        return [$this->offsetX, $this->offsetY];
-    }
-
-    /**
-     * @param int $offsetX
-     * @param int $offsetY
-     *
-     * @return Watermark
-     */
-    public function setOffset($offsetX, $offsetY)
-    {
-        $this->offsetX = intval($offsetX);
-        $this->offsetY = intval($offsetY);
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStyle()
-    {
-        return $this->style;
-    }
-
-    /**
-     * @param int $style
-     * @return Watermark
-     */
-    public function setStyle($style)
-    {
-        $this->style = $style;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTiled()
-    {
-        return $this->tiled;
-    }
-
-    /**
-     * @param bool $tiled
-     * @return Watermark
-     */
-    public function setTiled($tiled = true)
-    {
-        $this->tiled = $tiled;
-
-        return $this;
-    }
-
-    /**
-     * @param $width
-     * @param $height
-     *
-     * @return Watermark
-     */
-    public function setTileSize($width, $height)
-    {
-        $this->tileSize = [intval($width), intval($height)];
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getTileSize()
-    {
-        return $this->tileSize;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFont()
-    {
-        return $this->font;
-    }
-
-    /**
-     * @param string $font
-     * @return Watermark
-     */
-    public function setFont($font)
-    {
-        $this->font = escapeshellarg($font);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFontSize()
-    {
-        return escapeshellarg($this->fontSize);
-    }
-
-    /**
-     * @param int $fontSize
-     * @return Watermark
-     */
-    public function setFontSize($fontSize)
-    {
-        $this->fontSize = $fontSize;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOpacity()
-    {
-        return floatval($this->opacity);
-    }
-
-    /**
-     * @param float $opacity
-     * @return Watermark
-     */
-    public function setOpacity($opacity)
-    {
-        $this->opacity = $opacity;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRotate()
-    {
-        return escapeshellarg($this->rotate);
-    }
-
-    /**
-     * @param int $rotate
-     */
-    public function setRotate($rotate)
-    {
-        $this->rotate = $rotate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSource()
-    {
-        return escapeshellarg($this->source);
-    }
 }

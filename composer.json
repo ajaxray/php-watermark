@@ -19,6 +19,11 @@
         "psr-4": {"Ajaxray\\PHPWatermark\\": "src/"}
     },
     "autoload-dev": {
-        "psr-4": {"Ajaxray\\PHPWatermark\\": "tests/"}
+        "psr-4": {
+            "Ajaxray\\PHPWatermark\\": "tests/Ajaxray/PHPWatermark",
+            "Ajaxray\\TestUtils\\": "tests/Ajaxray/TestUtils"
+        }
+    },
+    "require-dev": {
     }
 }
