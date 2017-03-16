@@ -22,8 +22,14 @@ class PDFCommandBuilder extends AbstractCommandBuilder
      */
     function getImageMarkCommand($markerImage, $output, array $options)
     {
+        list($source, $destination) = $this->prepareContext($output, $options);
+        $marker = escapeshellarg($markerImage);
 
-        return "convert php.png -alpha set -channel A -evaluate set 30%  miff:- | convert -density 100 test.pdf null: - -gravity center -quality 100  -compose multiply -layers composite destination.pdf";
+        $opacity = $this->getMarkerOpacity();
+        $anchor = $this->getAnchor();
+        $offset = $this->getImageOffset();
+
+        return "convert $marker $opacity  miff:- | convert -density 100 $source null: - -$anchor -$offset -quality 100 -compose multiply -layers composite $destination";
     }
 
     /**
@@ -45,8 +51,13 @@ class PDFCommandBuilder extends AbstractCommandBuilder
         list($light, $dark) = $this->getDuelTextColor();
         list($offsetLight, $offsetDark) = $this->getDuelTextOffset();
 
-        return "convert $source $anchor -quality 100 -density 100 $font -$light -annotate {$rotate}{$offsetLight} $text -$dark -annotate {$rotate}{$offsetDark} $text  $destination";
-        //With rotate: convert examples/pdf/dark.pdf  -gravity NorthEast -quality 100 -density 100 -pointsize 24 -fill "rgba(255,255,255, .4)" -annotate 345x345+20+51 'ajaxray.com' -fill "rgba(0,0,0, .4)"  -annotate 345x345+21+51 'ajaxray.com' 'examples/pdf/test.pdf'
+        return "convert $source -$anchor -quality 100 -density 100 $font -$light -annotate {$rotate}{$offsetLight} $text -$dark -annotate {$rotate}{$offsetDark} $text  $destination";
+    }
+
+    private function getMarkerOpacity()
+    {
+        $opacity = $this->getOpacity() * 100;
+        return "-alpha set -channel A -evaluate set {$opacity}%";
     }
 
     protected function getDuelTextOffset()
@@ -61,5 +72,14 @@ class PDFCommandBuilder extends AbstractCommandBuilder
     protected function getRotate()
     {
         return empty($this->options['rotate']) ? '' : "{$this->options['rotate']}x{$this->options['rotate']}";
+    }
+
+    protected function getDuelTextColor()
+    {
+        // @TODO : Escape based on shell runner requirement
+        return [
+            "fill \"rgba(255,255,255,{$this->getOpacity()})\"",
+            "fill \"rgba(0,0,0,{$this->getOpacity()})\"",
+        ];
     }
 }

@@ -22,6 +22,12 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
         $mockGlobalFunctions = true;
     }
 
+    protected function tearDown()
+    {
+        global $mockGlobalFunctions;
+        $mockGlobalFunctions = true;
+    }
+
     public function testLoadingImageCommandBuilderForImages()
     {
         $watermark = new Watermark('path/to/image/file.jpeg');
@@ -51,7 +57,7 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
         new Watermark('path/to/test.html');
     }
 
-    public function testWithTextExecutesShellCommand()
+    public function testWatermarkWithTextExecutesShellCommand()
     {
         global $lastExecCommand;
         $watermark = new Watermark('path/to/file.png');
@@ -63,7 +69,28 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('output.jpg', $lastExecCommand);
     }
 
-    // @TODO : Test getters functions to check if converting them to expected format
+    public function testWatermarkWithImageExecutesShellCommand()
+    {
+        global $lastExecCommand;
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->withImage('path/company-logo.png', 'output.jpg');
+
+        $this->assertContains('composite', $lastExecCommand);
+        $this->assertContains('path/company-logo.png', $lastExecCommand);
+        $this->assertContains('path/to/file.jpg', $lastExecCommand);
+        $this->assertContains('output.jpg', $lastExecCommand);
+    }
+
+    public function testThrowsExceptionOnInvalidPosition()
+    {
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('Position SOMEWHERE_ELSE is not supported! Use Watermark::POSITION_* constants.');
+
+        $watermark = new Watermark('path/to/source.jpg');
+        $watermark->setPosition('SOMEWHERE_ELSE');
+    }
+
+    // @TODO : Test setter functions for casting or exception on unexpected value
 
 }
 
@@ -102,14 +129,16 @@ function mime_content_type($path)
     }
 }
 
-function exec($command, $output, $returnCode)
-{
-    global $mockGlobalFunctions, $lastExecCommand;
+if(! function_exists('Ajaxray\PHPWatermark\exec')) {
+    function exec($command, $output, $returnCode)
+    {
+        global $mockGlobalFunctions, $lastExecCommand;
 
-    if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-        $lastExecCommand = func_get_arg(0);
-    } else {
-        return call_user_func_array('\exec', func_get_args());
+        if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
+            $lastExecCommand = func_get_arg(0);
+            return 0;
+        } else {
+            return call_user_func_array('\exec', func_get_args());
+        }
     }
 }
-

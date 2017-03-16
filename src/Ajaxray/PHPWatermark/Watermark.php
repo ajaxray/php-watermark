@@ -28,12 +28,12 @@ class Watermark
     const POSITION_BOTTOM = 'South';
     const POSITION_BOTTOM_RIGHT = 'SouthEast';
 
-    // @TODO : Option to change style
-    const IMG_STYLE_DISSOLVE = 1;
-    const IMG_STYLE_COLORLESS = 2;
-    const TEXT_STYLE_BEVEL = 1;
-    const TEXT_STYLE_DARK = 2;
-    const TEXT_STYLE_LIGHT = 3;
+    // @TODO : Support to change text style
+    const STYLE_IMG_DISSOLVE = 1;
+    const STYLE_IMG_COLORLESS = 2;
+    const STYLE_TEXT_BEVEL = 1;
+    const STYLE_TEXT_DARK = 2;
+    const STYLE_TEXT_LIGHT = 3;
 
     const PATTERN_MIME_IMAGE = '/^image\/\w{1,4}$/';
     const PATTERN_MIME_PDF = '/^application\/(x\-)?pdf$/';
@@ -48,7 +48,7 @@ class Watermark
         'fontSize' => 24,
         'opacity' => 0.3,
         'rotate' => 0,
-        'style' => 1, // IMG_STYLE_DISSOLVE or TEXT_STYLE_BEVEL
+        'style' => 1, // STYLE_IMG_DISSOLVE or STYLE_TEXT_BEVEL
     ];
 
     private $source;
@@ -115,65 +115,6 @@ class Watermark
         } else {
             throw new \InvalidArgumentException("The source file type $mimeType is not supported");
         }
-    }
-
-    public function buildTextMarkCommand($text, $destination)
-    {
-        $source = $this->getSource();
-        $destination = escapeshellarg($destination);
-        $text = escapeshellarg($text);
-
-        $anchor = 'gravity '. $this->getPosition();
-        $rotate = ($this->getRotate() == '0')? '' : "rotate {$this->getRotate()}";
-
-        $font = "-pointsize {$this->getFontSize()} -font {$this->getFont()}";
-        $colorLight = "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"";
-        $colorDark = "fill \"rgba\\(0,0,0,{$this->getOpacity()}\\)\"";
-
-        $offset = $this->getOffset();
-        $offsetLight = "{$offset[0]},{$offset[1]}";
-        $offsetDark = ($offset[0] + 1) .','. ($offset[1] + 1);
-
-        $draw = " -draw \"$rotate $anchor $colorLight text $offsetLight $text $colorDark text $offsetDark $text \" ";
-
-        // @TODO : Fix issue with single quote
-        if($this->isTiled()) {
-            $size = "-size ". implode('x', $this->getTileSize());
-            $command = "convert $size xc:none  $font -$anchor $draw miff:- ";
-            $command .= " | composite -tile - $source  $destination";
-        } else {
-            $command = "convert $source $font $draw $destination";
-        }
-
-        return $command;
-    }
-
-    public function buildImageMarkCommand($marker, $destination)
-    {
-        $source = $this->getSource();
-        $destination = escapeshellarg($destination);
-        $marker = escapeshellarg($marker);
-
-        $anchor = 'gravity '. $this->getPosition();
-        $rotate = ($this->getRotate() == '0')? '' : "rotate {$this->getRotate()}";
-
-        $offsetArr = $this->getOffset();
-        $offset = "geometry +{$offsetArr[0]}+{$offsetArr[1]}";
-        $tile = $this->isTiled() ? '-tile' : '';
-        //$opacity = 'dissolve '. ($this->getOpacity() * 100) .'%';
-        $opacity = 'watermark '. ($this->getOpacity() * 100);
-
-        // @TODO : stretch to % of image or % of self
-        // @TODO : Gap/offset between image tiles
-        return "composite -$anchor -$offset -$rotate -$opacity $tile $marker $source $destination";
-    }
-
-    /**
-     * @return string
-     */
-    private function getSource()
-    {
-        return escapeshellarg($this->source);
     }
 
     /**
@@ -281,17 +222,20 @@ class Watermark
 
     /**
      * @param int $rotate Degree of rotation
+     * @return Watermark
      */
     public function setRotate($rotate)
     {
-        $this->options['rotate'] = intval($rotate);
+        $this->options['rotate'] = abs(intval($rotate));
+
+        return $this;
     }
 
     /**
      * @param bool $debug
      * @return Watermark
      */
-    public function setDebug($debug)
+    public function setDebug($debug = true)
     {
         $this->debug = boolval($debug);
 
@@ -327,7 +271,7 @@ class Watermark
         if (! is_writable($dirPath)) {
             $message = "The specified destination $dirPath is not writable!";
             throw new \RuntimeException($message);
-            // @TODO : Create DestNotWritableException
+            // @TODO : Create DestinationNotWritableException
         }
     }
 

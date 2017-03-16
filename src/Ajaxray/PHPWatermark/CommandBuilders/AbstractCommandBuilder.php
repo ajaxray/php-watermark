@@ -9,8 +9,6 @@
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
 
-use Ajaxray\PHPWatermark\Watermark;
-
 abstract class AbstractCommandBuilder
 {
     protected $options;
@@ -116,15 +114,6 @@ abstract class AbstractCommandBuilder
             ' -font '.escapeshellarg($this->options['font']);
     }
 
-    protected function getDuelTextColor()
-    {
-        // @TODO : Escape based on shell runner requirement
-        return [
-            "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"",
-            "fill \"rgba\\(0,0,0,{$this->getOpacity()}\\)\"",
-        ];
-    }
-
     protected function getDuelTextOffset()
     {
         $offset = $this->getOffset();
@@ -146,24 +135,6 @@ abstract class AbstractCommandBuilder
     protected function getOpacity()
     {
         return $this->options['opacity'];
-    }
-
-    /**
-     * @return string
-     */
-    protected function getImageOpacity()
-    {
-        $strategy = (Watermark::IMG_STYLE_COLORLESS == $this->options['style']) ? 'watermark' : 'dissolve';
-        return "$strategy ". ($this->options['opacity'] * 100) .'%';
-
-    }
-
-    /**
-     * @return string
-     */
-    protected function getRotate()
-    {
-        return empty($this->options['rotate']) ? '' : "rotate {$this->options['rotate']}";
     }
 
     /**
