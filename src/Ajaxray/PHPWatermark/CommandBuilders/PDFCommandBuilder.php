@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ajaxray
+ * User: Anis Ahmad <anis.programmer@gmail.com>
  * Date: 3/5/17
  * Time: 11:24 PM
  */
@@ -20,7 +20,7 @@ class PDFCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    function getImageMarkCommand($markerImage, $output, array $options)
+    public function getImageMarkCommand($markerImage, $output, array $options)
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $marker = escapeshellarg($markerImage);
@@ -40,7 +40,7 @@ class PDFCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    function getTextMarkCommand($text, $output, array $options)
+    public function getTextMarkCommand($text, $output, array $options)
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $text = escapeshellarg($text);
@@ -76,7 +76,6 @@ class PDFCommandBuilder extends AbstractCommandBuilder
 
     protected function getDuelTextColor()
     {
-        // @TODO : Escape based on shell runner requirement
         return [
             "fill \"rgba(255,255,255,{$this->getOpacity()})\"",
             "fill \"rgba(0,0,0,{$this->getOpacity()})\"",

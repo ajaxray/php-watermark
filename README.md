@@ -1,5 +1,12 @@
 # PHPWatermark
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353/small.png)](https://insight.sensiolabs.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353)
+[![Latest Stable Version](https://poser.pugx.org/ajaxray/php-watermark/v/stable)](https://packagist.org/packages/ajaxray/php-watermark)
+[![Coverage Status](https://coveralls.io/repos/github/ajaxray/php-watermark/badge.svg?branch=master)](https://coveralls.io/github/ajaxray/php-watermark?branch=master)
+[![Total Downloads](https://poser.pugx.org/ajaxray/php-watermark/downloads)](https://packagist.org/packages/ajaxray/php-watermark)
+[![License](https://poser.pugx.org/ajaxray/php-watermark/license)](https://packagist.org/packages/ajaxray/php-watermark)
+[![composer.lock](https://poser.pugx.org/ajaxray/php-watermark/composerlock)](https://packagist.org/packages/ajaxray/php-watermark)
+
 Add text or image Watermark on image and PDF using PHP and [ImageMagick][1].
 
 ### Pre-requisite
@@ -14,7 +21,7 @@ _PHP [ImageMagick][3] extension is **not required**._
  
  Add as a dependency with composer
  
- ```
+ ```bash
  $ composer require ajaxray/php-watermark
  ```
  
@@ -22,7 +29,7 @@ _PHP [ImageMagick][3] extension is **not required**._
  
  ### How to use?
  
- ```
+ ```php
   <?php
      // Initiate with source image of pdf
      $watermark = new Watermark('/path/to/source.jpg');
@@ -56,22 +63,22 @@ If output file name is skipped for `Watermark::withImage()` and `Watermark::with
 
  | Function | Value | Txt-Img | Img-Img | Txt-PDF | Img-PDF |
  |---|---|:---:|:---:|:---:|:---:|
- |setFont('Arial') | string; Font Name | √ |   | √ |   |
- |setFontSize(36) | int; Font size | √ |   | √ |   |
- |setOpacity(.4) | float; between 0 (opaque) to 1 (transparent) | √ | √ | √ | √ |
- |setRotate(245) | int; between 0 to 360 | √ |   | √ |   |
- |setPosition($position) | int; One of `Watermark::POSITION_*` constants | √ | √ | √ | √ |
- |setOffset(50, 100) | int, int; X and Y offset relative to position | √ | √ | √ | √ |
- |setStyle($style) | int; One of `Watermark::STYLE_*` constants | &#8987; | √ | &#8987; | &#8987; |
- |setTiled() | boolean; (default `true`) | √ | √ | &#8987; | &#8987;  |
- |setTileSize(200, 150) | int, int; Width and Height of each tile | √ |   | &#8987; |   |
+ |`setFont('Arial')` | string; Font Name | &#9989; |   | &#9989; |   |
+ |`setFontSize(36)` | int; Font size | &#9989; |   | &#9989; |   |
+ |`setOpacity(.4)` | float; between 0 (opaque) to 1 (transparent) | &#9989; | &#9989; | &#9989; | &#9989; |
+ |`setRotate(245)` | int; between 0 to 360 | &#9989; |   | &#9989; |   |
+ |`setPosition($position)` | int; One of `Watermark::POSITION_*` constants | &#9989; | &#9989; | &#9989; | &#9989; |
+ |`setOffset(50, 100)` | int, int; X and Y offset relative to position | &#9989; | &#9989; | &#9989; | &#9989; |
+ |`setStyle($style)` | int; One of `Watermark::STYLE_*` constants | &#8987; | &#9989; | &#8987; | &#8987; |
+ |`setTiled()` | boolean; (default `true`) | &#9989; | &#9989; | &#8987; | &#8987;  |
+ |`setTileSize(200, 150)` | int, int; Width and Height of each tile | &#9989; |   | &#8987; |   |
  
  Also, there is `Watermark::setDebug()` which will make `Watermark` object to return **imagemagick** command instead of executing it.
  
  BTW, all the samples linked above are the results of [these examples][9].
  You may generate them yourself just by running example scripts from command line - 
   
-```
+```bash
 $ php examples/example_img.php
 $ php examples/example_pdf.php
 ```
@@ -79,7 +86,7 @@ $ php examples/example_pdf.php
  
 #### Notes:
 
-* To see the list of supported font names your system, run `convert -list font` on command prompt
+* To see the list of supported font names in your system, run `convert -list font` on command prompt
 * Remember to set appropriate output file extension (e,g, .pdf for pdf files)
 * If possible, use absolute path for files to avoid various mistakes.
 * `STYLE_IMG_*` constants are for Image watermarks and `Watermark::STYLE_TEXT_*` are for text.

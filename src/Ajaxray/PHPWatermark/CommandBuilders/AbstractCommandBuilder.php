@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ajaxray
+ * User: Anis Ahmad <anis.programmer@gmail.com>
  * Date: 3/5/17
  * Time: 11:21 PM
  */
@@ -37,7 +37,7 @@ abstract class AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    abstract function getImageMarkCommand($markerImage, $output, array $options);
+    abstract public function getImageMarkCommand($markerImage, $output, array $options);
 
     /**
      * Build the imagemagick shell command for watermarking with Text
@@ -47,7 +47,7 @@ abstract class AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    abstract function getTextMarkCommand($text, $output, array $options);
+    abstract public function getTextMarkCommand($text, $output, array $options);
 
     /**
      * @return string

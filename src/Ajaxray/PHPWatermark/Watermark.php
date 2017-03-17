@@ -1,15 +1,14 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ajaxray
+ * User: Anis Ahmad <anis.programmer@gmail.com>
  * Date: 3/2/17
  * Time: 10:20 PM
  */
 
 namespace Ajaxray\PHPWatermark;
 
-// https://www.sitepoint.com/adding-text-watermarks-with-imagick/
-// http://www.imagemagick.org/Usage/annotating/#watermarking
+
 /**
  * Class Watermark
  *
@@ -28,7 +27,6 @@ class Watermark
     const POSITION_BOTTOM = 'South';
     const POSITION_BOTTOM_RIGHT = 'SouthEast';
 
-    // @TODO : Support to change text style
     const STYLE_IMG_DISSOLVE = 1;
     const STYLE_IMG_COLORLESS = 2;
     const STYLE_TEXT_BEVEL = 1;
@@ -78,6 +76,7 @@ class Watermark
         } else {
             $output = $returnCode = null;
             exec($this->commander->getTextMarkCommand($text, $destination, $this->options), $output, $returnCode);
+
             return (empty($output) && $returnCode === 0);
         }
     }
@@ -93,6 +92,7 @@ class Watermark
         } else {
             $output = $returnCode = null;
             exec($this->commander->getImageMarkCommand($marker, $destination, $this->options), $output, $returnCode);
+
             return (empty($output) && $returnCode === 0);
         }
     }
@@ -152,7 +152,6 @@ class Watermark
      */
     public function setStyle($style)
     {
-        // @TODO : Check if in valid styles
         $this->options['style'] = $style;
 
         return $this;
@@ -261,17 +260,15 @@ class Watermark
     {
         if (! file_exists($filePath)) {
             $message = "The specified source file $filePath was not found!";
-            throw new \RuntimeException($message);
-            // @TODO : Create SourceNotFoundException
+            throw new \InvalidArgumentException($message);
         }
     }
 
     private function ensureWritable($dirPath)
     {
-        if (! is_writable($dirPath)) {
+        if (!is_writable($dirPath)) {
             $message = "The specified destination $dirPath is not writable!";
-            throw new \RuntimeException($message);
-            // @TODO : Create DestinationNotWritableException
+            throw new \InvalidArgumentException($message);
         }
     }
 

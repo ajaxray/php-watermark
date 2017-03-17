@@ -1,13 +1,12 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ajaxray
+ * User: Anis Ahmad <anis.programmer@gmail.com>
  * Date: 3/5/17
  * Time: 11:24 PM
  */
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
-
 
 use Ajaxray\PHPWatermark\Watermark;
 
@@ -22,7 +21,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    function getImageMarkCommand($markerImage, $output, array $options)
+    public function getImageMarkCommand($markerImage, $output, array $options)
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $marker = escapeshellarg($markerImage);
@@ -33,8 +32,6 @@ class ImageCommandBuilder extends AbstractCommandBuilder
         $tile = $this->getTile();
         $opacity = $this->getImageOpacity();
 
-        // @TODO : stretch to % of image or % of self
-        // @TODO : Gap/offset between image tiles
         return "composite -$anchor -$offset -$opacity $tile $marker $source $destination";
     }
 
@@ -46,7 +43,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    function getTextMarkCommand($text, $output, array $options)
+    public function getTextMarkCommand($text, $output, array $options)
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $text = escapeshellarg($text);
@@ -60,7 +57,6 @@ class ImageCommandBuilder extends AbstractCommandBuilder
 
         $draw = " -draw \"$rotate $anchor $light text $offsetLight $text $dark text $offsetDark $text\" ";
 
-        // @TODO : Fix issue with single quote
         if($this->isTiled()) {
             $size = $this->getTextTileSize();
             $command = "convert $size xc:none  $font -$anchor $draw miff:- ";
@@ -74,7 +70,6 @@ class ImageCommandBuilder extends AbstractCommandBuilder
 
     protected function getDuelTextColor()
     {
-        // @TODO : Escape based on shell runner requirement
         return [
             "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"",
             "fill \"rgba\\(0,0,0,{$this->getOpacity()}\\)\"",

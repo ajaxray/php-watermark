@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: ajaxray
+ * User: Anis Ahmad <anis.programmer@gmail.com>
  * Date: 3/5/17
  * Time: 4:56 PM
  */
@@ -89,8 +89,6 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
         $watermark = new Watermark('path/to/source.jpg');
         $watermark->setPosition('SOMEWHERE_ELSE');
     }
-
-    // @TODO : Test setter functions for casting or exception on unexpected value
 
 }
 

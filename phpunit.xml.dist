@@ -16,6 +16,10 @@
         </whitelist>
     </filter>
 
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+
     <php>
         <ini name="date.timezone" value="UTC"/>
     </php>
