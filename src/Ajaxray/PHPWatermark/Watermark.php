@@ -113,7 +113,7 @@ class Watermark
         } elseif (preg_match(self::PATTERN_MIME_PDF, $mimeType)) {
             return new CommandBuilders\PDFCommandBuilder($sourcePath);
         } else {
-            throw new \InvalidArgumentException("The source file type $mimeType is not supported");
+            throw new \InvalidArgumentException("The source file type $mimeType is not supported.");
         }
     }
 
@@ -215,6 +215,9 @@ class Watermark
     public function setOpacity($opacity)
     {
         $this->options['opacity'] = floatval($opacity);
+        if($this->options['opacity'] < 0 || $this->options['opacity'] > 1) {
+            throw new \InvalidArgumentException('Opacity should be float between 0 to 1!');
+        }
 
         return $this;
     }
@@ -259,7 +262,7 @@ class Watermark
     private function ensureExists($filePath)
     {
         if (! file_exists($filePath)) {
-            $message = "The specified source file $filePath was not found!";
+            $message = "The specified file $filePath was not found!";
             throw new \InvalidArgumentException($message);
         }
     }

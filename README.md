@@ -2,6 +2,7 @@
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353/small.png)](https://insight.sensiolabs.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353)
 [![Latest Stable Version](https://poser.pugx.org/ajaxray/php-watermark/v/stable)](https://packagist.org/packages/ajaxray/php-watermark)
+[![Build Status](https://travis-ci.org/ajaxray/php-watermark.svg?branch=master)](https://travis-ci.org/ajaxray/php-watermark)
 [![Coverage Status](https://coveralls.io/repos/github/ajaxray/php-watermark/badge.svg?branch=master)](https://coveralls.io/github/ajaxray/php-watermark?branch=master)
 [![Total Downloads](https://poser.pugx.org/ajaxray/php-watermark/downloads)](https://packagist.org/packages/ajaxray/php-watermark)
 [![License](https://poser.pugx.org/ajaxray/php-watermark/license)](https://packagist.org/packages/ajaxray/php-watermark)
@@ -31,7 +32,7 @@ _PHP [ImageMagick][3] extension is **not required**._
  
  ```php
   <?php
-     // Initiate with source image of pdf
+     // Initiate with source image or pdf
      $watermark = new Watermark('/path/to/source.jpg');
      
      // Customize some options (See list of supported options below)

@@ -19,13 +19,16 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         global $mockGlobalFunctions;
+
         $mockGlobalFunctions = true;
     }
 
     protected function tearDown()
     {
-        global $mockGlobalFunctions;
-        $mockGlobalFunctions = true;
+        global $mockGlobalFunctions, $lastExecCommand;
+
+        $mockGlobalFunctions = false;
+        $lastExecCommand = null;
     }
 
     public function testLoadingImageCommandBuilderForImages()
@@ -90,6 +93,126 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
         $watermark->setPosition('SOMEWHERE_ELSE');
     }
 
+    public function testOffsetCastingToInt()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setOffset('220', '10cm');
+
+        $options = $this->invokeProperty($watermark, 'options');
+        $this->assertTrue(is_int($options['offsetX']));
+        $this->assertTrue(is_int($options['offsetY']));
+        $this->assertEquals(10, $options['offsetY']);
+    }
+
+    public function testOpacityCastingToFloat()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setOpacity('.5');
+
+        $options = $this->invokeProperty($watermark, 'options');
+        $this->assertTrue(is_float($options['opacity']));
+    }
+
+    public function testThrowsExceptionIfOpacityIsNotBetween0To1()
+    {
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('Opacity should be float between 0 to 1!');
+
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setOpacity(2);
+    }
+
+    public function testRotationCastingToAbsoluteInt()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setRotate('-5 degree');
+
+        $options = $this->invokeProperty($watermark, 'options');
+        $this->assertTrue(is_int($options['rotate']));
+        $this->assertEquals(5, $options['rotate']);
+    }
+
+    public function testSetTiledCastingToBoolean()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setTiled('y');
+
+        $options = $this->invokeProperty($watermark, 'options');
+        $this->assertTrue(is_bool($options['tiled']));
+        $this->assertSame(true, $options['tiled']);
+    }
+
+    public function testThrowsExceptionIfSourceNotFound()
+    {
+        global $mockGlobalFunctions;
+        $mockGlobalFunctions = false;
+
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('The specified file path/to/file.jpg was not found!');
+
+        new Watermark('path/to/file.jpg');
+    }
+
+    public function testThrowsExceptionIfMarkerImageNotFound()
+    {
+        global $mockGlobalFunctions;
+
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('The specified file non/existing/marker.png was not found!');
+
+        $watermark = new Watermark('path/to/file.jpg');
+
+        $mockGlobalFunctions = false;
+        $watermark->withImage('non/existing/marker.png');
+    }
+
+    public function testThrowsExceptionIfDestinationNotWritable()
+    {
+        global $mockGlobalFunctions;
+
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('The specified destination non/existing is not writable!');
+
+        $watermark = new Watermark('path/to/file.jpg');
+
+        $mockGlobalFunctions = false;
+        $watermark->withText('text', 'non/existing/output.jpg');
+    }
+
+    public function testThrowsExceptionIfSourceNotImageOrPDF()
+    {
+        global $mockGlobalFunctions;
+        $mockGlobalFunctions = false;
+
+        $this->expectException('\InvalidArgumentException');
+        $this->expectExceptionMessage('The source file type text/x-php is not supported.');
+
+        new Watermark(__FILE__);
+    }
+
+    public function testCommandNotExecutedIfDebugEnabled()
+    {
+        global $lastExecCommand;
+
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setDebug();
+        $watermark->withText('Whatever!');
+
+        $this->assertNull($lastExecCommand);
+    }
+
+    public function testCommandReturnedIfDebugEnabled()
+    {
+        global $lastExecCommand;
+
+        $watermark = new Watermark('path/to/file.jpg');
+        $watermark->setDebug();
+        $command = $watermark->withImage('path/to/logo.png');
+
+        $this->assertContains('composit', $command);
+        $this->assertContains('path/to/logo.png', $command);
+    }
+
 }
 
 
@@ -110,6 +233,18 @@ function file_exists($path)
         return call_user_func_array('\file_exists', func_get_args());
     }
 }
+
+function is_writable($path)
+{
+    global $mockGlobalFunctions;
+
+    if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
+        return true;
+    } else {
+        return call_user_func_array('\is_writable', func_get_args());
+    }
+}
+
 
 function mime_content_type($path)
 {
