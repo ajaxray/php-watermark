@@ -3,7 +3,7 @@
 
 use Ajaxray\PHPWatermark\Watermark;
 
-include __DIR__.'/../vendor/autoload.php';
+include 'vendor/autoload.php';
 
 $watermark = new Watermark(__DIR__ . '/img/poster.jpg');
 
@@ -18,7 +18,7 @@ $watermark->setFont('Arial')
 $text = "ajaxray.com";
 $watermark->withText($text, __DIR__.'/img/result_simple.jpg');
 
-// Watermarking Tiled/repeating text
+// Watermarking Tiled/  text
 $watermark->setTiled()
     ->setTileSize(200, 200)
     ->setFontSize(24)

@@ -80,9 +80,11 @@ If output file name is skipped for `Watermark::withImage()` and `Watermark::with
  You may generate them yourself just by running example scripts from command line - 
   
 ```bash
-$ php examples/example_img.php
-$ php examples/example_pdf.php
+$ php vendor/ajaxray/php-watermark/examples/example_img.php
+$ php vendor/ajaxray/php-watermark/examples/example_pdf.php
 ```
+Then you should get the result files in `vendor/ajaxray/php-watermark/examples/img` 
+and `vendor/ajaxray/php-watermark/examples/pdf` directories.
  
  
 #### Notes:

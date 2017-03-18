@@ -1,7 +1,7 @@
 <?php
 use Ajaxray\PHPWatermark\Watermark;
 
-include __DIR__.'/../vendor/autoload.php';
+include 'vendor/autoload.php';
 
 $watermark = new Watermark(__DIR__ . '/pdf/The_Man_In_The_Red_Underpants.pdf');
 
