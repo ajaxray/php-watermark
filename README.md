@@ -6,7 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ajaxray/php-watermark/badge.svg?branch=master)](https://coveralls.io/github/ajaxray/php-watermark?branch=master)
 [![Total Downloads](https://poser.pugx.org/ajaxray/php-watermark/downloads)](https://packagist.org/packages/ajaxray/php-watermark)
 [![License](https://poser.pugx.org/ajaxray/php-watermark/license)](https://packagist.org/packages/ajaxray/php-watermark)
-[![composer.lock](https://poser.pugx.org/ajaxray/php-watermark/composerlock)](https://packagist.org/packages/ajaxray/php-watermark)
+
 
 Add text or image Watermark on image and PDF using PHP and [ImageMagick][1].
 
@@ -93,6 +93,8 @@ $ php examples/example_pdf.php
 * `STYLE_IMG_*` constants are for Image watermarks and `Watermark::STYLE_TEXT_*` are for text.
 * Default text style (`Watermark::STYLE_TEXT_BEVEL`) is expected to be visible on any background. 
 Use other text styles only on selective backgrounds.
+* UnitTest are executed and all green against **PHP 5.6** and **PHP 7.1** using **PHPUnit 5.7.5**
+* I'v tested all intended functionality with **ImageMagick 7.0.4-6 Q16 x86_64** and **GPL Ghostscript 9.20** installed.  
  
 ---
 
