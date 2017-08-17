@@ -4,9 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/ajaxray/php-watermark/v/stable)](https://packagist.org/packages/ajaxray/php-watermark)
 [![Build Status](https://travis-ci.org/ajaxray/php-watermark.svg?branch=master)](https://travis-ci.org/ajaxray/php-watermark)
 [![Coverage Status](https://coveralls.io/repos/github/ajaxray/php-watermark/badge.svg?branch=master)](https://coveralls.io/github/ajaxray/php-watermark?branch=master)
-<!--
 [![Total Downloads](https://poser.pugx.org/ajaxray/php-watermark/downloads)](https://packagist.org/packages/ajaxray/php-watermark)
--->
 [![License](https://poser.pugx.org/ajaxray/php-watermark/license)](https://packagist.org/packages/ajaxray/php-watermark)
 
 
