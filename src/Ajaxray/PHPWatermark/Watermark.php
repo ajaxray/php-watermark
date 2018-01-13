@@ -20,9 +20,9 @@ class Watermark
     const POSITION_TOP_LEFT = 'NorthWest';
     const POSITION_TOP = 'North';
     const POSITION_TOP_RIGHT = 'NorthEast';
-    const POSITION_RIGHT = 'West';
+    const POSITION_LEFT = 'West';
     const POSITION_CENTER = 'Center';
-    const POSITION_LEFT = 'East';
+    const POSITION_RIGHT = 'East';
     const POSITION_BOTTOM_LEFT = 'SouthWest';
     const POSITION_BOTTOM = 'South';
     const POSITION_BOTTOM_RIGHT = 'SouthEast';
