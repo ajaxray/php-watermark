@@ -11,8 +11,9 @@ namespace Ajaxray\PHPWatermark\Tests\CommandBuilders;
 
 use Ajaxray\PHPWatermark\CommandBuilders\ImageCommandBuilder;
 use Ajaxray\PHPWatermark\Watermark;
+use PHPUnit\Framework\TestCase;
 
-class ImageCommandBuilderTest extends \PHPUnit_Framework_TestCase
+class ImageCommandBuilderTest extends TestCase
 {
     protected $options = [
         'position' => 'Center',

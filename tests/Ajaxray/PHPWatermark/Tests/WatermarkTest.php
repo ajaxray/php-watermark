@@ -11,8 +11,9 @@ use Ajaxray\PHPWatermark\CommandBuilders\ImageCommandBuilder;
 use Ajaxray\PHPWatermark\CommandBuilders\PDFCommandBuilder;
 use Ajaxray\PHPWatermark\Watermark;
 use Ajaxray\TestUtils\NonPublicAccess;
+use PHPUnit\Framework\TestCase;
 
-class WatermarkTest extends \PHPUnit_Framework_TestCase
+class WatermarkTest extends TestCase
 {
     use NonPublicAccess;
 
@@ -211,6 +212,56 @@ class WatermarkTest extends \PHPUnit_Framework_TestCase
 
         $this->assertContains('composit', $command);
         $this->assertContains('path/to/logo.png', $command);
+    }
+
+    public function testSetPositionOnPositionList()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $setPosition = $watermark->setPosition(Watermark::POSITION_CENTER);
+        $options = $this->invokeProperty($watermark, 'options');
+
+        $this->assertInstanceOf(Watermark::class, $setPosition);
+        $this->assertContains(Watermark::POSITION_CENTER, $options);
+    }
+
+    public function testSetStyle()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $setStyle = $watermark->setStyle(Watermark::STYLE_IMG_COLORLESS);
+        $options = $this->invokeProperty($watermark, 'options');
+
+        $this->assertInstanceOf(Watermark::class, $setStyle);
+        $this->assertContains(Watermark::STYLE_IMG_COLORLESS, $options);
+    }
+
+    public function testSetTileSize()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $setStyle = $watermark->setTileSize(200, 150);
+        $options = $this->invokeProperty($watermark, 'options');
+
+        $this->assertInstanceOf(Watermark::class, $setStyle);
+        $this->assertContains([200, 150], $options);
+    }
+
+    public function testSetFont()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $setFont = $watermark->setFont('Arial');
+        $options = $this->invokeProperty($watermark, 'options');
+
+        $this->assertInstanceOf(Watermark::class, $setFont);
+        $this->assertContains('Arial', $options);
+    }
+
+    public function testSetFontSize()
+    {
+        $watermark = new Watermark('path/to/file.jpg');
+        $setFontSize = $watermark->setFontSize(20);
+        $options = $this->invokeProperty($watermark, 'options');
+
+        $this->assertInstanceOf(Watermark::class, $setFontSize);
+        $this->assertContains(20, $options);
     }
 
 }
