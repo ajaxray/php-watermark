@@ -9,6 +9,8 @@
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
 
+use Ajaxray\PHPWatermark\Requirements\RequirementsChecker;
+
 abstract class AbstractCommandBuilder
 {
     protected $options;
@@ -26,6 +28,8 @@ abstract class AbstractCommandBuilder
     public function __construct($source)
     {
         $this->source = $source;
+
+        (new RequirementsChecker())->checkImagemagickInstallation();
     }
 
 
