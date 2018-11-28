@@ -11,8 +11,9 @@ namespace Ajaxray\PHPWatermark\Tests\CommandBuilders;
 
 use Ajaxray\PHPWatermark\CommandBuilders\PDFCommandBuilder;
 use Ajaxray\PHPWatermark\Watermark;
+use PHPUnit\Framework\TestCase;
 
-class PDFCommandBuilderTest extends \PHPUnit_Framework_TestCase
+class PDFCommandBuilderTest extends TestCase
 {
     protected $options = [
         'position' => 'Center',

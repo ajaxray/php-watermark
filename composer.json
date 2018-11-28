@@ -26,6 +26,6 @@
     },
     "require-dev": {
         "satooshi/php-coveralls": "v2.*",
-        "phpunit/phpunit": "5.7.5"
+        "phpunit/phpunit": "^5.7 || ^6.5"
     }
 }
