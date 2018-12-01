@@ -37,7 +37,7 @@ _PHP [ImageMagick][3] extension is **not required**._
      
      // Customize some options (See list of supported options below)
      $watermark->setFontSize(48)
-        ->setRotation(30)
+        ->setRotate(30)
         ->setOpacity(.4);
      
      // Watermark with Text
