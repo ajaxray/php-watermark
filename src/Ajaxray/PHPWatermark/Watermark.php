@@ -47,6 +47,8 @@ class Watermark
         'opacity' => 0.3,
         'rotate' => 0,
         'style' => 1, // STYLE_IMG_DISSOLVE or STYLE_TEXT_BEVEL
+        'backgroundColor' => "255,255,255",
+        'textColor' => "0,0,0"
     ];
 
     private $source;
@@ -275,4 +277,13 @@ class Watermark
         }
     }
 
+    public function setBackgroundColor($color)
+    {
+        $this->options['backgroundColor'] = $color;
+    }
+
+    public function setTextColor($color)
+    {
+        $this->options['backgroundColor'] = $color;
+    }
 }

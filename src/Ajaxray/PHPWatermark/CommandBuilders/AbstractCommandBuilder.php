@@ -148,4 +148,14 @@ abstract class AbstractCommandBuilder
     {
         return empty($this->isTiled()) ? '' : '-tile';
     }
+
+    protected function getBackgroundColor()
+    {
+        return $this->options['backgroundColor'];
+    }
+
+    protected function getTextColor()
+    {
+        return $this->options['textColor'];
+    }
 }
