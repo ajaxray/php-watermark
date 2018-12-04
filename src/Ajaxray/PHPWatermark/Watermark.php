@@ -284,6 +284,6 @@ class Watermark
 
     public function setTextColor($color)
     {
-        $this->options['backgroundColor'] = $color;
+        $this->options['textColor'] = $color;
     }
 }
