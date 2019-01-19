@@ -98,6 +98,16 @@ Use other text styles only on selective backgrounds.
 * UnitTest are executed and all green against **PHP 5.6** and **PHP 7.1** using **PHPUnit 5.7.5**
 * I'v tested all intended functionality with **ImageMagick 7.0.4-6 Q16 x86_64** and **GPL Ghostscript 9.20** installed.  
  
+
+#### Important Update for PDF watermarking:
+
+When using the imagemagick + ghostscript extraction and joining pdf pages, it has a few drawbacks including file-size issue. Many developers were asking for a solution about the file size and PDF quality since releasing of this library.
+So, I've created a command line tool for PDF watermarking that will work without converting pages into images. As a result, you'll get better PDF quality and dramatically smaller file size.
+
+https://github.com/ajaxray/markpdf
+
+Please note that, it's not a PHP library. So you've to use it using [exec][10], [shell_exec][11] or [Symfony Process Component][12].
+
 ---
 
 > "This is the Book about which there is no doubt, a guidance for those conscious of Allah" - [Al-Quran](http://quran.com)
@@ -111,3 +121,6 @@ Use other text styles only on selective backgrounds.
 [7]: https://www.dropbox.com/s/aorp9aoggynn3pt/watermark_text_on_pdf.pdf?dl=0 "Text Watermarking on PDF"
 [8]: https://www.dropbox.com/s/myn2is2nx3xtm3v/watermark_img_on_pdf.pdf?dl=0 "Image Watermarking on PDF"
 [9]: https://github.com/ajaxray/php-watermark/tree/master/examples "Example scripts"
+[10]: http://php.net/manual/en/function.exec.php
+[11]: http://php.net/manual/en/function.shell-exec.php
+[12]: https://symfony.com/doc/current/components/process.html
