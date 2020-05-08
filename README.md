@@ -73,8 +73,7 @@ If output file name is skipped for `Watermark::withImage()` and `Watermark::with
  |`setStyle($style)` | int; One of `Watermark::STYLE_*` constants | &#8987; | &#9989; | &#8987; | &#8987; |
  |`setTiled()` | boolean; (default `true`) | &#9989; | &#9989; | &#8987; | &#8987;  |
  |`setTileSize(200, 150)` | int, int; Width and Height of each tile | &#9989; |   | &#8987; |   |
- 
- Also, there is `Watermark::setDebug()` which will make `Watermark` object to return **imagemagick** command instead of executing it.
+
  
  BTW, all the samples linked above are the results of [these examples][9].
  You may generate them yourself just by running example scripts from command line - 
@@ -86,7 +85,23 @@ $ php vendor/ajaxray/php-watermark/examples/example_pdf.php
 Then you should get the result files in `vendor/ajaxray/php-watermark/examples/img` 
 and `vendor/ajaxray/php-watermark/examples/pdf` directories.
  
- 
+### Something unexpected? Debug! 🐞🔫 
+
+If anything unexpected happened, try to debug the issue.
+
+1. First step is to check if PHP is configured to display errors. Alternatively you may add these lines at the top of your script. 
+    ```php
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+    ```
+2. A common reason of not getting expected result is mistakes in filepaths. You may try logging / printing source and destination file paths. 
+3. Check the permission of the parent directory of destination path. Destination directory indicates -
+    - The file path mentioned in the second argument of `Watermark::withText()` and `Watermark::withImage()` methods. 
+    - Parent of the source file itself if no separate destination mentioned in above methods.
+4. There is `Watermark::setDebug()` method which will make `Watermark` object to return **imagemagick** command instead of executing it. 
+Then, you may run the output manually to check if there is any error in underlying `imagemagick` commands. 
+
+
 #### Notes:
 
 * To see the list of supported font names in your system, run `convert -list font` on command prompt
