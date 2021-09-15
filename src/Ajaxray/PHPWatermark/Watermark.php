@@ -71,7 +71,7 @@ class Watermark
         $destination = $writeTo ?: $this->source;
         $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
 
-        if($this->debug) {
+        if ($this->debug) {
             return $this->commander->getTextMarkCommand($text, $destination, $this->options);
         } else {
             $output = $returnCode = null;
@@ -87,7 +87,7 @@ class Watermark
         $this->ensureExists($marker);
         $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
 
-        if($this->debug) {
+        if ($this->debug) {
             return $this->commander->getImageMarkCommand($marker, $destination, $this->options);
         } else {
             $output = $returnCode = null;
@@ -123,7 +123,7 @@ class Watermark
      */
     public function setPosition($position)
     {
-        if(in_array($position, $this->supportedPositionList())) {
+        if (in_array($position, $this->supportedPositionList())) {
             $this->options['position'] = $position;
         } else {
             throw new \InvalidArgumentException("Position $position is not supported! Use Watermark::POSITION_* constants.");
@@ -215,7 +215,8 @@ class Watermark
     public function setOpacity($opacity)
     {
         $this->options['opacity'] = floatval($opacity);
-        if($this->options['opacity'] < 0 || $this->options['opacity'] > 1) {
+
+        if ($this->options['opacity'] < 0 || $this->options['opacity'] > 1) {
             throw new \InvalidArgumentException('Opacity should be float between 0 to 1!');
         }
 
