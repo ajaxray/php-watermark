@@ -81,7 +81,7 @@ class Watermark
     public function withText(string $text): static
     {
         $this->marker = $text;
-        $this->markerType = self::MARKER_IMG;
+        $this->markerType = self::MARKER_TEXT;
 
         return $this;
     }

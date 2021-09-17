@@ -13,18 +13,20 @@ use Ajaxray\PHPWatermark\Watermark;
 use Ajaxray\TestUtils\NonPublicAccess;
 use PHPUnit\Framework\TestCase;
 
+include_once('OverrideFuncs.php');
+
 class WatermarkTest extends TestCase
 {
     use NonPublicAccess;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         global $mockGlobalFunctions;
 
         $mockGlobalFunctions = true;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         global $mockGlobalFunctions, $lastExecCommand;
 
@@ -35,22 +37,22 @@ class WatermarkTest extends TestCase
     public function testLoadingImageCommandBuilderForImages()
     {
         $watermark = new Watermark('path/to/image/file.jpeg');
-        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commander'));
+        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
 
         $watermark = new Watermark('path/to/image/file.jpg');
-        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commander'));
+        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
 
         $watermark = new Watermark('path/to/file.png');
-        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commander'));
+        $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
     }
 
-    public function testLoadingPDFCommandBuilderForPDFs()
+    public function testLoadingPDFCommandBuilderForPdfs()
     {
         $watermark = new Watermark('path/to/pdf/file.pdf');
-        $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commander'));
+        $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
 
         $watermark = new Watermark('path/to/x-pdf/file.pdf');
-        $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commander'));
+        $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
     }
 
     public function testThrowsExceptionForUnsupportedSourceTypes()
@@ -65,24 +67,26 @@ class WatermarkTest extends TestCase
     {
         global $lastExecCommand;
         $watermark = new Watermark('path/to/file.png');
-        $watermark->withText('CONFIDENTIAL', 'output.jpg');
+        $watermark->withText('CONFIDENTIAL')
+            ->write('output.jpg');
 
-        $this->assertContains('convert', $lastExecCommand);
-        $this->assertContains('CONFIDENTIAL', $lastExecCommand);
-        $this->assertContains('path/to/file.png', $lastExecCommand);
-        $this->assertContains('output.jpg', $lastExecCommand);
+        $this->assertStringContainsString('convert', $lastExecCommand);
+        $this->assertStringContainsString('CONFIDENTIAL', $lastExecCommand);
+        $this->assertStringContainsString('path/to/file.png', $lastExecCommand);
+        $this->assertStringContainsString('output.jpg', $lastExecCommand);
     }
 
     public function testWatermarkWithImageExecutesShellCommand()
     {
         global $lastExecCommand;
         $watermark = new Watermark('path/to/file.jpg');
-        $watermark->withImage('path/company-logo.png', 'output.jpg');
+        $watermark->withImage('path/company-logo.png')
+            ->write('output.jpg');
 
-        $this->assertContains('composite', $lastExecCommand);
-        $this->assertContains('path/company-logo.png', $lastExecCommand);
-        $this->assertContains('path/to/file.jpg', $lastExecCommand);
-        $this->assertContains('output.jpg', $lastExecCommand);
+        $this->assertStringContainsString('composite', $lastExecCommand);
+        $this->assertStringContainsString('path/company-logo.png', $lastExecCommand);
+        $this->assertStringContainsString('path/to/file.jpg', $lastExecCommand);
+        $this->assertStringContainsString('output.jpg', $lastExecCommand);
     }
 
     public function testThrowsExceptionOnInvalidPosition()
@@ -92,26 +96,6 @@ class WatermarkTest extends TestCase
 
         $watermark = new Watermark('path/to/source.jpg');
         $watermark->setPosition('SOMEWHERE_ELSE');
-    }
-
-    public function testOffsetCastingToInt()
-    {
-        $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setOffset('220', '10cm');
-
-        $options = $this->invokeProperty($watermark, 'options');
-        $this->assertTrue(is_int($options['offsetX']));
-        $this->assertTrue(is_int($options['offsetY']));
-        $this->assertEquals(10, $options['offsetY']);
-    }
-
-    public function testOpacityCastingToFloat()
-    {
-        $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setOpacity('.5');
-
-        $options = $this->invokeProperty($watermark, 'options');
-        $this->assertTrue(is_float($options['opacity']));
     }
 
     public function testThrowsExceptionIfOpacityIsNotBetween0To1()
@@ -126,7 +110,7 @@ class WatermarkTest extends TestCase
     public function testRotationCastingToAbsoluteInt()
     {
         $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setRotate('-5 degree');
+        $watermark->setRotate(5);
 
         $options = $this->invokeProperty($watermark, 'options');
         $this->assertTrue(is_int($options['rotate']));
@@ -177,7 +161,8 @@ class WatermarkTest extends TestCase
         $watermark = new Watermark('path/to/file.jpg');
 
         $mockGlobalFunctions = false;
-        $watermark->withText('text', 'non/existing/output.jpg');
+        $watermark->withText('text')
+            ->write('non/existing/output.jpg');
     }
 
     public function testThrowsExceptionIfSourceNotImageOrPDF()
@@ -191,27 +176,16 @@ class WatermarkTest extends TestCase
         new Watermark(__FILE__);
     }
 
-    public function testCommandNotExecutedIfDebugEnabled()
+    public function testGetCommandReturnsStringCommand()
     {
         global $lastExecCommand;
 
         $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setDebug();
-        $watermark->withText('Whatever!');
+        $command = $watermark->withImage('path/to/logo.png')
+            ->getCommand();
 
-        $this->assertNull($lastExecCommand);
-    }
-
-    public function testCommandReturnedIfDebugEnabled()
-    {
-        global $lastExecCommand;
-
-        $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setDebug();
-        $command = $watermark->withImage('path/to/logo.png');
-
-        $this->assertContains('composit', $command);
-        $this->assertContains('path/to/logo.png', $command);
+        $this->assertStringContainsString('composit', $command);
+        $this->assertStringContainsString('path/to/logo.png', $command);
     }
 
     public function testSetPositionOnPositionList()
@@ -264,65 +238,4 @@ class WatermarkTest extends TestCase
         $this->assertContains(20, $options);
     }
 
-}
-
-
-// Mechanism for mocking some built in functions
-
-namespace Ajaxray\PHPWatermark;
-
-$GLOBALS['mockGlobalFunctions'] = false;
-$GLOBALS['lastExecCommand'] = null;
-
-function file_exists($path)
-{
-    global $mockGlobalFunctions;
-
-    if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-        return true;
-    } else {
-        return call_user_func_array('\file_exists', func_get_args());
-    }
-}
-
-function is_writable($path)
-{
-    global $mockGlobalFunctions;
-
-    if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-        return true;
-    } else {
-        return call_user_func_array('\is_writable', func_get_args());
-    }
-}
-
-
-function mime_content_type($path)
-{
-    global $mockGlobalFunctions;
-
-    if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-        if(preg_match('/(png)|(jpe?g)|(gif)/', $path, $match)) {
-            return 'image/'. $match[0];
-        } elseif (preg_match('/(pdf)|(x\-pdf)/', $path, $match)) {
-            return 'application/'. $match[0];
-        }
-        return 'no-pdf/no-image';
-    } else {
-        return call_user_func_array('\mime_content_type', func_get_args());
-    }
-}
-
-if(! function_exists('Ajaxray\PHPWatermark\exec')) {
-    function exec($command, $output, $returnCode)
-    {
-        global $mockGlobalFunctions, $lastExecCommand;
-
-        if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-            $lastExecCommand = func_get_arg(0);
-            return 0;
-        } else {
-            return call_user_func_array('\exec', func_get_args());
-        }
-    }
 }

@@ -7,20 +7,17 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <blacklist>
+    <coverage>
+        <exclude>
             <directory suffix=".php">vendor/</directory>
-        </blacklist>
-        <whitelist>
+        </exclude>
+        <include>
             <directory suffix=".php">src/Ajaxray/PHPWatermark/</directory>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
+        </include>
+    </coverage>
 
     <php>
         <ini name="date.timezone" value="UTC"/>
+        <includePath>tests/Ajaxray/TestUtils/</includePath>
     </php>
 </phpunit>
