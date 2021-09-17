@@ -289,5 +289,4 @@ class Watermark
             throw new InvalidArgumentException("The specified destination $dirPath is not writable!");
         }
     }
-
 }

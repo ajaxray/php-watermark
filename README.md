@@ -25,8 +25,13 @@ _PHP [ImageMagick][3] extension is **not required**._
  ```bash
  $ composer require ajaxray/php-watermark
  ```
- 
- Or download latest version as a [Zip file](https://github.com/ajaxray/php-watermark/archive/master.zip).
+Or download latest version as a [Zip file](https://github.com/ajaxray/php-watermark/archive/master.zip).
+
+For PHP versions `>= 5.6` to `<8` use `v0.1.2` 
+ ```bash
+ $ composer require ajaxray/php-watermark:v0.1.2
+ ```
+
  
  ### How to use?
  
@@ -36,17 +41,20 @@ _PHP [ImageMagick][3] extension is **not required**._
      $watermark = new Watermark('/path/to/source.jpg');
      
      // Customize some options (See list of supported options below)
-     $watermark->setFontSize(48)
+     $watermark->withText('ajaxray.com')
+        ->setFontSize(48)
         ->setRotate(30)
-        ->setOpacity(.4);
+        ->setOpacity(.4)
+        ->write('path/to/output.jpg');
      
-     // Watermark with Text
-     $watermark->withText('ajaxray.com', 'path/to/output.jpg');
      
      // Watermark with Image
-     $watermark->withImage('path/to/logo.png', 'path/to/output.jpg');
+     $watermark->withImage('path/to/logo.png')
+        ->setPosition(Watermark::POSITION_BOTTOM_RIGHT)
+        ->setStyle(Watermark::STYLE_IMG_DISSOLVE)
+        ->write('path/to/output.jpg');
   ```
-If output file name is skipped for `Watermark::withImage()` and `Watermark::withText()` function, the source file will be overridden. 
+If output file name is skipped for `Watermark::write()` function, the source file will be overridden. 
  
  
  ### Customization options

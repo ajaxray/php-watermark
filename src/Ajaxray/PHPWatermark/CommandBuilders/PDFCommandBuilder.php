@@ -49,13 +49,13 @@ class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkComma
         return "convert $source -$anchor -quality 100 -density 100 $font -$light -annotate {$rotate}{$offsetLight} $text -$dark -annotate {$rotate}{$offsetDark} $text  $destination";
     }
 
-    private function getMarkerOpacity()
+    private function getMarkerOpacity(): string
     {
         $opacity = $this->getOpacity() * 100;
         return "-alpha set -channel A -evaluate set {$opacity}%";
     }
 
-    protected function getDuelTextOffset()
+    protected function getDuelTextOffset(): array
     {
         $offset = $this->getOffset();
         return [
@@ -64,12 +64,12 @@ class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkComma
         ];
     }
 
-    protected function getRotate()
+    protected function getRotate(): string
     {
         return empty($this->options['rotate']) ? '' : "{$this->options['rotate']}x{$this->options['rotate']}";
     }
 
-    protected function getDuelTextColor()
+    protected function getDuelTextColor(): array
     {
         return [
             "fill \"rgba(255,255,255,{$this->getOpacity()})\"",

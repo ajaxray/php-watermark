@@ -1,6 +1,8 @@
 <?php
+
 declare(strict_types=1);
-// Mechanism for mocking some built in functions
+
+// Mechanism for mocking some built-in functions
 
 namespace Ajaxray\PHPWatermark;
 

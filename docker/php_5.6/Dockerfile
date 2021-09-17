@@ -17,6 +17,12 @@ RUN apk add --update --no-cache sqlite-dev rsync imagemagick bash pngcrush optip
 # sysvsem sysvshm tidy tokenizer wddx xml xmlreader xmlrpc xmlwriter xsl zip
 RUN docker-php-ext-install -j$(nproc) pdo_mysql pdo_sqlite
 
+# Install composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# I need fonts for watermarking with Text
+RUN apk --no-cache add msttcorefonts-installer fontconfig && \
+    update-ms-fonts && \
+    fc-cache -f
 
 # ENTRYPOINT ["php"]

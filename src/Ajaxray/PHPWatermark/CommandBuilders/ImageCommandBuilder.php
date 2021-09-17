@@ -52,7 +52,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
 
         $draw = " -draw \"$rotate $anchor $light text $offsetLight $text $dark text $offsetDark $text\" ";
 
-        if($this->isTiled()) {
+        if ($this->isTiled()) {
             $size = $this->getTextTileSize();
             $command = "convert $size xc:none  $font -$anchor $draw miff:- ";
             $command .= " | composite -tile - $source  $destination";
@@ -63,7 +63,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
         return $command;
     }
 
-    protected function getDuelTextColor()
+    protected function getDuelTextColor(): array
     {
         return [
             "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"",
@@ -74,7 +74,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
     /**
      * @return string
      */
-    protected function getRotate()
+    protected function getRotate(): string
     {
         return empty($this->options['rotate']) ? '' : "rotate {$this->options['rotate']}";
     }
@@ -82,11 +82,9 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
     /**
      * @return string
      */
-    protected function getImageOpacity()
+    protected function getImageOpacity(): string
     {
         $strategy = (Watermark::STYLE_IMG_COLORLESS == $this->options['style']) ? 'watermark' : 'dissolve';
         return "$strategy ". ($this->options['opacity'] * 100) .'%';
-
     }
-
 }

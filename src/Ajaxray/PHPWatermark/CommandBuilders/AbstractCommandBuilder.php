@@ -77,13 +77,13 @@ abstract class AbstractCommandBuilder
     /**
      * @return string
      */
-    protected function getFont()
+    protected function getFont(): string
     {
         return '-pointsize ' . intval($this->options['fontSize']) .
             ' -font ' . escapeshellarg($this->options['font']);
     }
 
-    protected function getDuelTextOffset()
+    protected function getDuelTextOffset(): array
     {
         $offset = $this->getOffset();
         return [
@@ -92,7 +92,7 @@ abstract class AbstractCommandBuilder
         ];
     }
 
-    protected function getImageOffset()
+    protected function getImageOffset(): string
     {
         $offsetArr = $this->getOffset();
         return "geometry +{$offsetArr[0]}+{$offsetArr[1]}";
@@ -101,7 +101,7 @@ abstract class AbstractCommandBuilder
     /**
      * @return float
      */
-    protected function getOpacity()
+    protected function getOpacity(): float
     {
         return $this->options['opacity'];
     }
@@ -109,7 +109,7 @@ abstract class AbstractCommandBuilder
     /**
      * @return string
      */
-    protected function getTile()
+    protected function getTile(): string
     {
         return empty($this->isTiled()) ? '' : '-tile';
     }

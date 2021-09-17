@@ -1,10 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/9/17
- * Time: 11:32 AM
- */
+
+declare(strict_types=1);
 
 namespace Ajaxray\TestUtils;
 
@@ -19,7 +15,7 @@ trait NonPublicAccess
      *
      * @return mixed Method return.
      */
-    public function invokeMethod(&$object, $methodName, array $parameters = array())
+    public function invokeMethod(object &$object, string $methodName, array $parameters = array()): mixed
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);
@@ -36,7 +32,7 @@ trait NonPublicAccess
      * @return mixed Object property.
      *
      */
-    public function invokeProperty(&$object, $propName)
+    public function invokeProperty(object &$object, string $propName): mixed
     {
         $reflection = new \ReflectionClass(get_class($object));
         $prop = $reflection->getProperty($propName);

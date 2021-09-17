@@ -1,10 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/5/17
- * Time: 4:56 PM
- */
+
+declare(strict_types=1);
+
 namespace Ajaxray\PHPWatermark\Tests;
 
 use Ajaxray\PHPWatermark\CommandBuilders\ImageCommandBuilder;
@@ -13,12 +10,13 @@ use Ajaxray\PHPWatermark\Watermark;
 use Ajaxray\TestUtils\NonPublicAccess;
 use PHPUnit\Framework\TestCase;
 
-include_once('OverrideFuncs.php');
-
 class WatermarkTest extends TestCase
 {
     use NonPublicAccess;
 
+    /**
+     * @see tests/Ajaxray/TestUtils/OverrideFuncs.php
+     */
     protected function setUp(): void
     {
         global $mockGlobalFunctions;
@@ -34,7 +32,7 @@ class WatermarkTest extends TestCase
         $lastExecCommand = null;
     }
 
-    public function testLoadingImageCommandBuilderForImages()
+    public function testLoadingImageCommandBuilderForImages(): void
     {
         $watermark = new Watermark('path/to/image/file.jpeg');
         $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
@@ -46,7 +44,7 @@ class WatermarkTest extends TestCase
         $this->assertInstanceOf(ImageCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
     }
 
-    public function testLoadingPDFCommandBuilderForPdfs()
+    public function testLoadingPDFCommandBuilderForPdfs(): void
     {
         $watermark = new Watermark('path/to/pdf/file.pdf');
         $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
@@ -55,7 +53,7 @@ class WatermarkTest extends TestCase
         $this->assertInstanceOf(PDFCommandBuilder::class, $this->invokeProperty($watermark, 'commandBuilder'));
     }
 
-    public function testThrowsExceptionForUnsupportedSourceTypes()
+    public function testThrowsExceptionForUnsupportedSourceTypes(): void
     {
         $this->expectException('\InvalidArgumentException');
         $this->expectExceptionMessage('The source file type no-pdf/no-image is not supported');
@@ -63,7 +61,7 @@ class WatermarkTest extends TestCase
         new Watermark('path/to/test.html');
     }
 
-    public function testWatermarkWithTextExecutesShellCommand()
+    public function testWatermarkWithTextExecutesShellCommand(): void
     {
         global $lastExecCommand;
         $watermark = new Watermark('path/to/file.png');
@@ -76,7 +74,7 @@ class WatermarkTest extends TestCase
         $this->assertStringContainsString('output.jpg', $lastExecCommand);
     }
 
-    public function testWatermarkWithImageExecutesShellCommand()
+    public function testWatermarkWithImageExecutesShellCommand(): void
     {
         global $lastExecCommand;
         $watermark = new Watermark('path/to/file.jpg');
@@ -89,7 +87,7 @@ class WatermarkTest extends TestCase
         $this->assertStringContainsString('output.jpg', $lastExecCommand);
     }
 
-    public function testThrowsExceptionOnInvalidPosition()
+    public function testThrowsExceptionOnInvalidPosition(): void
     {
         $this->expectException('\InvalidArgumentException');
         $this->expectExceptionMessage('Position SOMEWHERE_ELSE is not supported! Use Watermark::POSITION_* constants.');
@@ -98,7 +96,7 @@ class WatermarkTest extends TestCase
         $watermark->setPosition('SOMEWHERE_ELSE');
     }
 
-    public function testThrowsExceptionIfOpacityIsNotBetween0To1()
+    public function testThrowsExceptionIfOpacityIsNotBetween0To1(): void
     {
         $this->expectException('\InvalidArgumentException');
         $this->expectExceptionMessage('Opacity should be float between 0 to 1!');
@@ -107,7 +105,7 @@ class WatermarkTest extends TestCase
         $watermark->setOpacity(2);
     }
 
-    public function testRotationCastingToAbsoluteInt()
+    public function testRotationCastingToAbsoluteInt(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $watermark->setRotate(5);
@@ -117,17 +115,7 @@ class WatermarkTest extends TestCase
         $this->assertEquals(5, $options['rotate']);
     }
 
-    public function testSetTiledCastingToBoolean()
-    {
-        $watermark = new Watermark('path/to/file.jpg');
-        $watermark->setTiled('y');
-
-        $options = $this->invokeProperty($watermark, 'options');
-        $this->assertTrue(is_bool($options['tiled']));
-        $this->assertSame(true, $options['tiled']);
-    }
-
-    public function testThrowsExceptionIfSourceNotFound()
+    public function testThrowsExceptionIfSourceNotFound(): void
     {
         global $mockGlobalFunctions;
         $mockGlobalFunctions = false;
@@ -138,7 +126,7 @@ class WatermarkTest extends TestCase
         new Watermark('path/to/file.jpg');
     }
 
-    public function testThrowsExceptionIfMarkerImageNotFound()
+    public function testThrowsExceptionIfMarkerImageNotFound(): void
     {
         global $mockGlobalFunctions;
 
@@ -151,7 +139,7 @@ class WatermarkTest extends TestCase
         $watermark->withImage('non/existing/marker.png');
     }
 
-    public function testThrowsExceptionIfDestinationNotWritable()
+    public function testThrowsExceptionIfDestinationNotWritable(): void
     {
         global $mockGlobalFunctions;
 
@@ -165,7 +153,7 @@ class WatermarkTest extends TestCase
             ->write('non/existing/output.jpg');
     }
 
-    public function testThrowsExceptionIfSourceNotImageOrPDF()
+    public function testThrowsExceptionIfSourceNotImageOrPDF(): void
     {
         global $mockGlobalFunctions;
         $mockGlobalFunctions = false;
@@ -176,7 +164,7 @@ class WatermarkTest extends TestCase
         new Watermark(__FILE__);
     }
 
-    public function testGetCommandReturnsStringCommand()
+    public function testGetCommandReturnsStringCommand(): void
     {
         global $lastExecCommand;
 
@@ -188,7 +176,7 @@ class WatermarkTest extends TestCase
         $this->assertStringContainsString('path/to/logo.png', $command);
     }
 
-    public function testSetPositionOnPositionList()
+    public function testSetPositionOnPositionList(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $setPosition = $watermark->setPosition(Watermark::POSITION_CENTER);
@@ -198,7 +186,7 @@ class WatermarkTest extends TestCase
         $this->assertContains(Watermark::POSITION_CENTER, $options);
     }
 
-    public function testSetStyle()
+    public function testSetStyle(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $setStyle = $watermark->setStyle(Watermark::STYLE_IMG_COLORLESS);
@@ -208,7 +196,7 @@ class WatermarkTest extends TestCase
         $this->assertContains(Watermark::STYLE_IMG_COLORLESS, $options);
     }
 
-    public function testSetTileSize()
+    public function testSetTileSize(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $setStyle = $watermark->setTileSize(200, 150);
@@ -218,7 +206,7 @@ class WatermarkTest extends TestCase
         $this->assertContains([200, 150], $options);
     }
 
-    public function testSetFont()
+    public function testSetFont(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $setFont = $watermark->setFont('Arial');
@@ -228,7 +216,7 @@ class WatermarkTest extends TestCase
         $this->assertContains('Arial', $options);
     }
 
-    public function testSetFontSize()
+    public function testSetFontSize(): void
     {
         $watermark = new Watermark('path/to/file.jpg');
         $setFontSize = $watermark->setFontSize(20);
