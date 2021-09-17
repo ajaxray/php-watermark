@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-        "php": ">=5.6 <8"
+        "php": ">=7.0",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {"Ajaxray\\PHPWatermark\\": "src/Ajaxray/PHPWatermark/"}
@@ -25,7 +26,7 @@
         }
     },
     "require-dev": {
-        "satooshi/php-coveralls": "v2.*",
-        "phpunit/phpunit": "^5.7 || ^6.5"
+        "satooshi/php-coveralls": "*",
+        "phpunit/phpunit": "9.*"
     }
 }

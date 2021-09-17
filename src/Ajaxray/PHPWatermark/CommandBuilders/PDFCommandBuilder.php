@@ -1,15 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/5/17
- * Time: 11:24 PM
- */
+declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
-
-class PDFCommandBuilder extends AbstractCommandBuilder
+class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
 {
 
     /**
@@ -20,7 +14,7 @@ class PDFCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    public function getImageMarkCommand($markerImage, $output, array $options)
+    public function getImageMarkCommand(string $markerImage, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $marker = escapeshellarg($markerImage);
@@ -40,7 +34,7 @@ class PDFCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    public function getTextMarkCommand($text, $output, array $options)
+    public function getTextMarkCommand(string $text, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $text = escapeshellarg($text);
@@ -48,6 +42,7 @@ class PDFCommandBuilder extends AbstractCommandBuilder
         $anchor = $this->getAnchor();
         $rotate = $this->getRotate();
         $font = $this->getFont();
+
         list($light, $dark) = $this->getDuelTextColor();
         list($offsetLight, $offsetDark) = $this->getDuelTextOffset();
 

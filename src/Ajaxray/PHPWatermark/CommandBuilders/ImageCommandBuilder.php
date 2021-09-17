@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/5/17
- * Time: 11:24 PM
- */
+declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
 use Ajaxray\PHPWatermark\Watermark;
 
-class ImageCommandBuilder extends AbstractCommandBuilder
+class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
 {
 
     /**
@@ -21,7 +16,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    public function getImageMarkCommand($markerImage, $output, array $options)
+    public function getImageMarkCommand(string $markerImage, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $marker = escapeshellarg($markerImage);
@@ -43,7 +38,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder
      * @param array $options
      * @return string
      */
-    public function getTextMarkCommand($text, $output, array $options)
+    public function getTextMarkCommand(string $text, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
         $text = escapeshellarg($text);

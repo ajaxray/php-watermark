@@ -1,13 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/2/17
- * Time: 10:20 PM
- */
+declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark;
 
+use Ajaxray\PHPWatermark\CommandBuilders\BuilderFactory;
+use Ajaxray\PHPWatermark\CommandBuilders\WatermarkCommandBuilder;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * Class Watermark
@@ -29,14 +28,17 @@ class Watermark
 
     const STYLE_IMG_DISSOLVE = 1;
     const STYLE_IMG_COLORLESS = 2;
+
     const STYLE_TEXT_BEVEL = 1;
     const STYLE_TEXT_DARK = 2;
     const STYLE_TEXT_LIGHT = 3;
 
-    const PATTERN_MIME_IMAGE = '/^image\/\w{1,4}$/';
-    const PATTERN_MIME_PDF = '/^application\/(x\-)?pdf$/';
+    // Type of Watermarking
+    const MARKER_TEXT = 1;
+    const MARKER_IMG = 2;
 
-    private $options = [
+
+    private array $options = [
         'position' => 'Center',
         'offsetX' => 0,
         'offsetY' => 0,
@@ -49,84 +51,102 @@ class Watermark
         'style' => 1, // STYLE_IMG_DISSOLVE or STYLE_TEXT_BEVEL
     ];
 
-    private $source;
-    private $commander;
-    private $debug = false;
+    /** @var string The Text/filePath to watermark with */
+    private string $marker;
+
+    /** @var int $markerType Type of the marker. MARKER_* values applicable */
+    private int $markerType;
+
+    private WatermarkCommandBuilder $commandBuilder;
 
     /**
      * Watermark constructor.
      *
      * @param string $source Source Image
+     * @return self
      */
-    public function __construct($source)
+    public function __construct(private string $source)
     {
-        $this->source = $source;
-        $this->commander = $this->getCommandBuilder($source);
+        $this->ensureExists($this->source);
+
+        $this->commandBuilder = BuilderFactory::getCommandBuilder($this->source);
 
         return $this;
     }
 
-    public function withText($text, $writeTo = null)
+    /**
+     * @param string $text Text to be used as watermark
+     * @return Watermark
+     */
+    public function withText(string $text): static
     {
-        $destination = $writeTo ?: $this->source;
-        $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
+        $this->marker = $text;
+        $this->markerType = self::MARKER_IMG;
 
-        if ($this->debug) {
-            return $this->commander->getTextMarkCommand($text, $destination, $this->options);
-        } else {
-            $output = $returnCode = null;
-            exec($this->commander->getTextMarkCommand($text, $destination, $this->options), $output, $returnCode);
-
-            return (empty($output) && $returnCode === 0);
-        }
+        return $this;
     }
 
-    public function withImage($marker, $writeTo = null)
+    /**
+     * @param string $marker Image path to be used as watermark
+     * @return self
+     */
+    public function withImage(string $marker): static
     {
-        $destination = $writeTo ?: $this->source;
         $this->ensureExists($marker);
-        $this->ensureWritable(($writeTo ? dirname($destination) : $destination));
 
-        if ($this->debug) {
-            return $this->commander->getImageMarkCommand($marker, $destination, $this->options);
+        $this->marker = $marker;
+        $this->markerType = self::MARKER_IMG;
+
+        return $this;
+    }
+
+    /**
+     * Make the executable ImageMagick command
+     *
+     * @throws LogicException
+     * @param string|null $outputPath
+     * @return string
+     */
+    public function getCommand(?string $outputPath = null): string
+    {
+        $destination = $outputPath ?? $this->source;
+
+        $this->ensureWritable(($outputPath ? dirname($destination) : $destination));
+
+        if ($this->markerType == self::MARKER_IMG) {
+            return $this->commandBuilder->getImageMarkCommand($this->marker, $destination, $this->options);
+        } elseif ($this->markerType == self::MARKER_TEXT) {
+            return $this->commandBuilder->getTextMarkCommand($this->marker, $destination, $this->options);
         } else {
-            $output = $returnCode = null;
-            exec($this->commander->getImageMarkCommand($marker, $destination, $this->options), $output, $returnCode);
-
-            return (empty($output) && $returnCode === 0);
+            throw new LogicException("Text or Image was not set to watermark with");
         }
     }
 
     /**
-     * Factory for choosing CommandBuilder
+     * Write the output image
      *
-     * @param $sourcePath
-     * @return CommandBuilders\ImageCommandBuilder|CommandBuilders\PDFCommandBuilder
+     * @param string|null $outputPath Path of output image. Overwrite source image in case of null
+     * @return bool
      */
-    protected function getCommandBuilder($sourcePath)
+    public function write(?string $outputPath = null): bool
     {
-        $this->ensureExists($this->source);
-        $mimeType = mime_content_type($sourcePath);
+        $output = $returnCode = null;
+        exec($this->getCommand($outputPath), $output, $returnCode);
 
-        if (preg_match(self::PATTERN_MIME_IMAGE, $mimeType)) {
-            return new CommandBuilders\ImageCommandBuilder($sourcePath);
-        } elseif (preg_match(self::PATTERN_MIME_PDF, $mimeType)) {
-            return new CommandBuilders\PDFCommandBuilder($sourcePath);
-        } else {
-            throw new \InvalidArgumentException("The source file type $mimeType is not supported.");
-        }
+        return (empty($output) && $returnCode === 0);
     }
+
 
     /**
      * @param string $position  One of Watermark::POSITION_* constants
-     * @return Watermark
+     * @return self
      */
-    public function setPosition($position)
+    public function setPosition(string $position): static
     {
         if (in_array($position, $this->supportedPositionList())) {
             $this->options['position'] = $position;
         } else {
-            throw new \InvalidArgumentException("Position $position is not supported! Use Watermark::POSITION_* constants.");
+            throw new InvalidArgumentException("Position $position is not supported! Use Watermark::POSITION_* constants.");
         }
 
         return $this;
@@ -136,9 +156,9 @@ class Watermark
      * @param int $offsetX
      * @param int $offsetY
      *
-     * @return Watermark
+     * @return self
      */
-    public function setOffset($offsetX, $offsetY)
+    public function setOffset(int $offsetX, int $offsetY): static
     {
         $this->options['offsetX'] = intval($offsetX);
         $this->options['offsetY'] = intval($offsetY);
@@ -150,7 +170,7 @@ class Watermark
      * @param int $style
      * @return Watermark
      */
-    public function setStyle($style)
+    public function setStyle($style): static
     {
         $this->options['style'] = $style;
 
@@ -161,9 +181,9 @@ class Watermark
      * @param bool $tiled
      * @return Watermark
      */
-    public function setTiled($tiled = true)
+    public function setTiled(bool $tiled = true): static
     {
-        $this->options['tiled'] = boolval($tiled);
+        $this->options['tiled'] = $tiled;
 
         return $this;
     }
@@ -171,14 +191,13 @@ class Watermark
     /**
      * Size of tile box.
      *
-     * @param $width
-     * @param $height
-     *
+     * @param int $width
+     * @param int $height
      * @return Watermark
      */
-    public function setTileSize($width, $height)
+    public function setTileSize(int $width, int $height): static
     {
-        $this->options['tileSize'] = [intval($width), intval($height)];
+        $this->options['tileSize'] = [$width, $height];
 
         return $this;
     }
@@ -189,7 +208,7 @@ class Watermark
      * @param string $font
      * @return Watermark
      */
-    public function setFont($font)
+    public function setFont(string $font): static
     {
         $this->options['font'] = $font;
 
@@ -200,9 +219,9 @@ class Watermark
      * @param int $fontSize
      * @return Watermark
      */
-    public function setFontSize($fontSize)
+    public function setFontSize(int $fontSize): static
     {
-        $this->options['fontSize'] = intval($fontSize);
+        $this->options['fontSize'] = $fontSize;
 
         return $this;
     }
@@ -212,12 +231,12 @@ class Watermark
      * @param float $opacity Between .1 (very transparent) to .9 (almost opaque).
      * @return Watermark
      */
-    public function setOpacity($opacity)
+    public function setOpacity(float $opacity): static
     {
-        $this->options['opacity'] = floatval($opacity);
+        $this->options['opacity'] = $opacity;
 
         if ($this->options['opacity'] < 0 || $this->options['opacity'] > 1) {
-            throw new \InvalidArgumentException('Opacity should be float between 0 to 1!');
+            throw new InvalidArgumentException('Opacity should be float between 0 to 1!');
         }
 
         return $this;
@@ -227,25 +246,14 @@ class Watermark
      * @param int $rotate Degree of rotation
      * @return Watermark
      */
-    public function setRotate($rotate)
+    public function setRotate(int $rotate): static
     {
-        $this->options['rotate'] = abs(intval($rotate));
+        $this->options['rotate'] = abs($rotate);
 
         return $this;
     }
 
-    /**
-     * @param bool $debug
-     * @return Watermark
-     */
-    public function setDebug($debug = true)
-    {
-        $this->debug = boolval($debug);
-
-        return $this;
-    }
-
-    final public function supportedPositionList()
+    final public function supportedPositionList(): array
     {
         return [
             self::POSITION_TOP_LEFT,
@@ -260,19 +268,25 @@ class Watermark
         ];
     }
 
-    private function ensureExists($filePath)
+    /**
+     * @param string $filePath
+     * @throws InvalidArgumentException
+     */
+    private function ensureExists(string $filePath): void
     {
         if (! file_exists($filePath)) {
-            $message = "The specified file $filePath was not found!";
-            throw new \InvalidArgumentException($message);
+            throw new InvalidArgumentException("The specified file $filePath was not found!");
         }
     }
 
-    private function ensureWritable($dirPath)
+    /**
+     * @param string $dirPath
+     * @throws InvalidArgumentException
+     */
+    private function ensureWritable(string $dirPath): void
     {
         if (!is_writable($dirPath)) {
-            $message = "The specified destination $dirPath is not writable!";
-            throw new \InvalidArgumentException($message);
+            throw new InvalidArgumentException("The specified destination $dirPath is not writable!");
         }
     }
 

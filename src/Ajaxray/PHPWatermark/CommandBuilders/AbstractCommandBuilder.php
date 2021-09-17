@@ -1,62 +1,39 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Anis Ahmad <anis.programmer@gmail.com>
- * Date: 3/5/17
- * Time: 11:21 PM
- */
+
+declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
-
 use Ajaxray\PHPWatermark\Requirements\RequirementsChecker;
 
+/**
+ * AbstractCommandBuilder defines common functionalities of all CommandBuilder classes
+ */
 abstract class AbstractCommandBuilder
 {
-    protected $options;
+    protected array $options;
 
     /**
      * @var string Source file path
      */
-    protected $source;
+    protected string $source;
 
     /**
      * AbstractCommandBuilder constructor.
      *
      * @param string $source The source file to watermark on
      */
-    public function __construct($source)
+    public function __construct(string $source)
     {
         $this->source = $source;
 
         (new RequirementsChecker())->checkImagemagickInstallation();
     }
 
-
-    /**
-     * Build the imagemagick shell command for watermarking with Image
-     *
-     * @param string $markerImage The image file to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
-    abstract public function getImageMarkCommand($markerImage, $output, array $options);
-
-    /**
-     * Build the imagemagick shell command for watermarking with Text
-     *
-     * @param string $text The text content to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
-    abstract public function getTextMarkCommand($text, $output, array $options);
-
     /**
      * @return string
      */
-    protected function getSource()
+    protected function getSource(): string
     {
         return escapeshellarg($this->source);
     }
@@ -66,47 +43,35 @@ abstract class AbstractCommandBuilder
      * @param array $options
      * @return array
      */
-    protected function prepareContext($output, array $options)
+    protected function prepareContext($output, array $options): array
     {
         $this->options = $options;
         return array($this->getSource(), escapeshellarg($output));
     }
 
-    protected function getAnchor()
+    protected function getAnchor(): string
     {
-        return 'gravity '. $this->options['position'];
+        return 'gravity ' . $this->options['position'];
     }
 
-    /**
-     * @return array
-     */
-    protected function getOffset()
+    protected function getOffset(): array
     {
         return [$this->options['offsetX'], $this->options['offsetY']];
     }
 
-    /**
-     * @return int
-     */
-    protected function getStyle()
+    protected function getStyle(): int
     {
         return $this->options['style'];
     }
 
-    /**
-     * @return bool
-     */
-    protected function isTiled()
+    protected function isTiled(): bool
     {
         return $this->options['tiled'];
     }
 
-    /**
-     * @return string
-     */
-    protected function getTextTileSize()
+    protected function getTextTileSize(): string
     {
-        return "-size ".implode('x', $this->options['tileSize']);
+        return "-size " . implode('x', $this->options['tileSize']);
     }
 
     /**
@@ -114,8 +79,8 @@ abstract class AbstractCommandBuilder
      */
     protected function getFont()
     {
-        return '-pointsize '.intval($this->options['fontSize']).
-            ' -font '.escapeshellarg($this->options['font']);
+        return '-pointsize ' . intval($this->options['fontSize']) .
+            ' -font ' . escapeshellarg($this->options['font']);
     }
 
     protected function getDuelTextOffset()
@@ -123,7 +88,7 @@ abstract class AbstractCommandBuilder
         $offset = $this->getOffset();
         return [
             "{$offset[0]},{$offset[1]}",
-            ($offset[0] + 1) .','. ($offset[1] + 1),
+            ($offset[0] + 1) . ',' . ($offset[1] + 1),
         ];
     }
 
