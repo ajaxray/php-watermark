@@ -1,22 +1,14 @@
-<?php
-/**
- * Criado por Maizer Aly de O. Gomes para php-watermark.
- * Email: maizer.gomes@gmail.com / maizer.gomes@ekutivasolutions / maizer.gomes@outlook.com
- * Usuário: maizerg
- * Data: 7/20/18
- * Hora: 12:01 PM
- */
+<?php declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\Requirements;
 
 class RequirementsChecker
 {
-
-    public function checkImagemagickInstallation()
+    public function ensureImagemagickInstallation(): bool
     {
-        exec("convert -version", $out, $rcode);
+        exec("convert -version", $out, $returnCode);
 
-        if ($rcode) {
+        if ($returnCode !== 0) {
             throw new \BadFunctionCallException("ImageMagick not found in this system.");
         }
 

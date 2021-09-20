@@ -1,19 +1,10 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
-class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
+final class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
 {
-
-    /**
-     * Build the imagemagick shell command for watermarking with Image
-     *
-     * @param string $markerImage The image file to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
+    /** @inheritDoc */
     public function getImageMarkCommand(string $markerImage, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
@@ -23,17 +14,18 @@ class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkComma
         $anchor = $this->getAnchor();
         $offset = $this->getImageOffset();
 
-        return "convert $marker $opacity  miff:- | convert -density 100 $source null: - -$anchor -$offset -quality 100 -compose multiply -layers composite $destination";
+        return sprintf(
+            "convert %s %s  miff:- | convert -density 100 %s null: - -%s -%s -quality 100 -compose multiply -layers composite %s",
+            $marker,
+            $opacity,
+            $source,
+            $anchor,
+            $offset,
+            $destination
+        );
     }
 
-    /**
-     * Build the imagemagick shell command for watermarking with Text
-     *
-     * @param string $text The text content to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
+    /** @inheritDoc */
     public function getTextMarkCommand(string $text, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
@@ -46,18 +38,34 @@ class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkComma
         list($light, $dark) = $this->getDuelTextColor();
         list($offsetLight, $offsetDark) = $this->getDuelTextOffset();
 
-        return "convert $source -$anchor -quality 100 -density 100 $font -$light -annotate {$rotate}{$offsetLight} $text -$dark -annotate {$rotate}{$offsetDark} $text  $destination";
+        return sprintf(
+            "convert %s -%s -quality 100 -density 100 %s -%s -annotate %s%s %s -%s -annotate %s%s %s  %s",
+            $source,
+            $anchor,
+            $font,
+            $light,
+            $rotate,
+            $offsetLight,
+            $text,
+            $dark,
+            $rotate,
+            $offsetDark,
+            $text,
+            $destination
+        );
     }
 
     private function getMarkerOpacity(): string
     {
         $opacity = $this->getOpacity() * 100;
+
         return "-alpha set -channel A -evaluate set {$opacity}%";
     }
 
     protected function getDuelTextOffset(): array
     {
         $offset = $this->getOffset();
+
         return [
             "+{$offset[0]}+{$offset[1]}",
             '+'.($offset[0] + 1) .'+'. ($offset[1] + 1),

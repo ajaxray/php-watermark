@@ -1,51 +1,30 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
 use Ajaxray\PHPWatermark\Requirements\RequirementsChecker;
 
-/**
- * AbstractCommandBuilder defines common functionalities of all CommandBuilder classes
- */
 abstract class AbstractCommandBuilder
 {
     protected array $options;
-
-    /**
-     * @var string Source file path
-     */
     protected string $source;
 
-    /**
-     * AbstractCommandBuilder constructor.
-     *
-     * @param string $source The source file to watermark on
-     */
     public function __construct(string $source)
     {
         $this->source = $source;
 
-        (new RequirementsChecker())->checkImagemagickInstallation();
+        (new RequirementsChecker())->ensureImagemagickInstallation();
     }
 
-    /**
-     * @return string
-     */
     protected function getSource(): string
     {
         return escapeshellarg($this->source);
     }
 
-    /**
-     * @param $output
-     * @param array $options
-     * @return array
-     */
     protected function prepareContext($output, array $options): array
     {
         $this->options = $options;
+
         return array($this->getSource(), escapeshellarg($output));
     }
 
@@ -74,9 +53,6 @@ abstract class AbstractCommandBuilder
         return "-size " . implode('x', $this->options['tileSize']);
     }
 
-    /**
-     * @return string
-     */
     protected function getFont(): string
     {
         return '-pointsize ' . intval($this->options['fontSize']) .
@@ -86,6 +62,7 @@ abstract class AbstractCommandBuilder
     protected function getDuelTextOffset(): array
     {
         $offset = $this->getOffset();
+
         return [
             "{$offset[0]},{$offset[1]}",
             ($offset[0] + 1) . ',' . ($offset[1] + 1),
@@ -95,20 +72,15 @@ abstract class AbstractCommandBuilder
     protected function getImageOffset(): string
     {
         $offsetArr = $this->getOffset();
+
         return "geometry +{$offsetArr[0]}+{$offsetArr[1]}";
     }
 
-    /**
-     * @return float
-     */
     protected function getOpacity(): float
     {
         return $this->options['opacity'];
     }
 
-    /**
-     * @return string
-     */
     protected function getTile(): string
     {
         return empty($this->isTiled()) ? '' : '-tile';

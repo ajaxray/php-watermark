@@ -1,21 +1,12 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
 use Ajaxray\PHPWatermark\Watermark;
 
-class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
+final class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
 {
-
-    /**
-     * Build the imagemagick shell command for watermarking with Image
-     *
-     * @param string $markerImage The image file to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
+    /** @inheritDoc */
     public function getImageMarkCommand(string $markerImage, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
@@ -30,14 +21,7 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
         return "composite -$anchor -$offset -$opacity $tile $marker $source $destination";
     }
 
-    /**
-     * Build the imagemagick shell command for watermarking with Text
-     *
-     * @param string $text The text content to watermark with
-     * @param string $output The watermarked output file
-     * @param array $options
-     * @return string
-     */
+    /** @inheritDoc */
     public function getTextMarkCommand(string $text, string $output, array $options): string
     {
         list($source, $destination) = $this->prepareContext($output, $options);
@@ -71,20 +55,15 @@ class ImageCommandBuilder extends AbstractCommandBuilder implements WatermarkCom
         ];
     }
 
-    /**
-     * @return string
-     */
     protected function getRotate(): string
     {
         return empty($this->options['rotate']) ? '' : "rotate {$this->options['rotate']}";
     }
 
-    /**
-     * @return string
-     */
     protected function getImageOpacity(): string
     {
         $strategy = (Watermark::STYLE_IMG_COLORLESS == $this->options['style']) ? 'watermark' : 'dissolve';
+
         return "$strategy ". ($this->options['opacity'] * 100) .'%';
     }
 }

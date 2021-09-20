@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 // Mechanism for mocking some built-in functions
 
@@ -31,7 +29,7 @@ function is_writable(string $path)
     }
 }
 
-if(! function_exists('Ajaxray\PHPWatermark\exec')) {
+if (!function_exists('Ajaxray\PHPWatermark\exec')) {
     function exec($command, $output, $returnCode)
     {
         global $mockGlobalFunctions, $lastExecCommand;
@@ -46,15 +44,16 @@ if(! function_exists('Ajaxray\PHPWatermark\exec')) {
 }
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
+
 function mime_content_type($path)
 {
     global $mockGlobalFunctions;
 
     if (isset($mockGlobalFunctions) && $mockGlobalFunctions === true) {
-        if(preg_match('/(png)|(jpe?g)|(gif)/', $path, $match)) {
-            return 'image/'. $match[0];
+        if (preg_match('/(png)|(jpe?g)|(gif)/', $path, $match)) {
+            return 'image/' . $match[0];
         } elseif (preg_match('/(pdf)|(x\-pdf)/', $path, $match)) {
-            return 'application/'. $match[0];
+            return 'application/' . $match[0];
         }
         return 'no-pdf/no-image';
     } else {

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Ajaxray\PHPWatermark\Tests;
 
@@ -15,7 +13,7 @@ class WatermarkTest extends TestCase
     use NonPublicAccess;
 
     /**
-     * @see tests/Ajaxray/TestUtils/OverrideFuncs.php
+     * @see tests/Ajaxray/TestUtils/OverrideFunctions.php
      */
     protected function setUp(): void
     {
