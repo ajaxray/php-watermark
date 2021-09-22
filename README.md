@@ -31,6 +31,7 @@ For PHP versions `>= 5.6` to `<8` use `v0.1.2`
  ```bash
  $ composer require ajaxray/php-watermark:v0.1.2
  ```
+ Also you should check [older readme file](https://github.com/ajaxray/php-watermark/tree/v0.1.2#readme) for PHP version `<8`
 
  
  ### How to use?
