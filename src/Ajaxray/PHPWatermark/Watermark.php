@@ -3,7 +3,7 @@
 namespace Ajaxray\PHPWatermark;
 
 use Ajaxray\PHPWatermark\CommandBuilders\CommandBuilderFactory;
-use Ajaxray\PHPWatermark\CommandBuilders\WatermarkCommandBuilder;
+use Ajaxray\PHPWatermark\CommandBuilders\WatermarkCommandBuilderInterface;
 
 class Watermark
 {
@@ -31,7 +31,7 @@ class Watermark
     private string $source;
     private string $marker;
     private int $markerType;
-    private WatermarkCommandBuilder $commandBuilder;
+    private WatermarkCommandBuilderInterface $commandBuilder;
 
     private array $options = [
         'position' => 'Center',

@@ -2,7 +2,7 @@
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
-interface WatermarkCommandBuilder
+interface WatermarkCommandBuilderInterface
 {
     /**
      * Build the imagemagick shell command for watermarking with Image

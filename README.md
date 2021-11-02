@@ -1,6 +1,6 @@
 # PHPWatermark
 
-[![SensioLabsInsight](https://insight.symfony.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353/big.svg)](https://insight.symfony.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353)
+[![SensioLabsInsight](https://insight.symfony.com/projects/df0125e5-463e-4135-bfc2-252dec120fc3/big.svg)](https://insight.symfony.com/projects/cf8fe138-7232-4390-a3c6-f9e509221353)
 [![Latest Stable Version](https://poser.pugx.org/ajaxray/php-watermark/v/stable)](https://packagist.org/packages/ajaxray/php-watermark)
 [![Build Status](https://travis-ci.org/ajaxray/php-watermark.svg?branch=master)](https://travis-ci.org/ajaxray/php-watermark)
 [![Coverage Status](https://coveralls.io/repos/github/ajaxray/php-watermark/badge.svg?branch=master)](https://coveralls.io/github/ajaxray/php-watermark?branch=master)

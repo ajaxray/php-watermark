@@ -2,7 +2,7 @@
 
 namespace Ajaxray\PHPWatermark\CommandBuilders;
 
-final class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilder
+final class PDFCommandBuilder extends AbstractCommandBuilder implements WatermarkCommandBuilderInterface
 {
     /** @inheritDoc */
     public function getImageMarkCommand(string $markerImage, string $output, array $options): string
