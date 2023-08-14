@@ -50,7 +50,8 @@ final class ImageCommandBuilder extends AbstractCommandBuilder implements Waterm
     protected function getDuelTextColor(): array
     {
         return [
-            "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"",
+            // "fill \"rgba\\(255,255,255,{$this->getOpacity()}\\)\"",
+            'fill "' . $this->options['fontcolor'] . '\ "',
             "fill \"rgba\\(0,0,0,{$this->getOpacity()}\\)\"",
         ];
     }
