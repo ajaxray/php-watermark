@@ -44,6 +44,7 @@ class Watermark
         'opacity' => 0.3,
         'rotate' => 0,
         'style' => 1, // STYLE_IMG_DISSOLVE or STYLE_TEXT_BEVEL
+        'fontcolor' => '#ffffff',
     ];
 
     public function __construct(string $source)
@@ -161,6 +162,18 @@ class Watermark
     }
 
     /**
+     * Font color. Should to be in rgb or rgba format 
+     *
+     * @param string $fontColor
+     * @return Watermark
+     * Added by shqawe@gmail.com
+     */
+    public function setFontColor($fontColor)
+    {
+        $this->options['fontcolor'] = $this->_prepareColorForWaterMark($fontColor);
+    }
+
+    /**
      * @param float $opacity Between .1 (very transparent) to .9 (almost opaque).
      */
     public function setOpacity(float $opacity): self
@@ -211,5 +224,59 @@ class Watermark
         if (! is_writable($dirPath)) {
             throw new \InvalidArgumentException("The specified destination $dirPath is not writable!");
         }
+    }
+
+     /**
+     *  Prepare color for watermark command line
+     */
+    private function _prepareColorForWaterMark($color)
+    {
+        $hexColor = $this->_colorToRGB($color);
+
+        $opecity = $this->options['opacity'];
+
+        $rgba = "rgba\\(" . $hexColor[0] . "," . $hexColor[1] . "," . $hexColor[2] . "," . $opecity . "\\)";
+        return $rgba;
+    }
+    
+    private function _colorToRGB($hex)
+    {
+        $hex = strtolower($hex);
+
+        if (strpos($hex, 'rgba') !== false) {
+            preg_match('/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/i', $hex, $rgb);
+
+            if ($rgb) {
+                if (!empty($rgb[4]) && \XF::options()->up_wm_opecity === 0) {
+                    $this->setOpacity(intval(127 - 127 * $rgb[4]));
+                }
+
+                return [$rgb[1], $rgb[2], $rgb[3]];
+            }
+        }
+
+        if (strpos($hex, 'rgb') !== false) {
+            preg_match('/^rgb\(\s*(\d+%?)\s*,\s*(\d+%?)\s*,\s*(\d+%?)\s*\)$/i', $hex, $rgb);
+
+            if ($rgb) {
+                return [$rgb[1], $rgb[2], $rgb[3]];
+            }
+        } else {
+            $hex = str_replace('#', '', $hex);
+
+            if (utf8_strlen($hex) == 3) {
+                $r = hexdec(substr($hex, 0, 1) . substr($hex, 0, 1));
+                $g = hexdec(substr($hex, 1, 1) . substr($hex, 1, 1));
+                $b = hexdec(substr($hex, 2, 1) . substr($hex, 2, 1));
+            } else {
+                $r = hexdec(substr($hex, 0, 2));
+                $g = hexdec(substr($hex, 2, 2));
+                $b = hexdec(substr($hex, 4, 2));
+            }
+
+            return [$r, $g, $b];
+        }
+
+        return [0, 0, 0];
     }
 }
