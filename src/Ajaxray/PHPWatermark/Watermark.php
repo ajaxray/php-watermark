@@ -170,7 +170,7 @@ class Watermark
      */
     public function setFontColor($fontColor)
     {
-        $this->options['fontcolor'] = $fontColor;
+        $this->options['fontcolor'] = $this->_prepareColorForWaterMark($fontColor);
     }
 
     /**
@@ -224,6 +224,19 @@ class Watermark
         if (! is_writable($dirPath)) {
             throw new \InvalidArgumentException("The specified destination $dirPath is not writable!");
         }
+    }
+
+     /**
+     *  Prepare color for watermark command line
+     */
+    private function _prepareColorForWaterMark($color)
+    {
+        $hexColor = $this->_colorToRGB($color);
+
+        $opecity = $this->options['opacity'];
+
+        $rgba = "rgba\\(" . $hexColor[0] . "," . $hexColor[1] . "," . $hexColor[2] . "," . $opecity . "\\)";
+        return $rgba;
     }
     
     private function _colorToRGB($hex)
